@@ -1,0 +1,15 @@
+{
+    "libraries": [
+    	"helpers.js",
+        "bukkitHelpers.js",
+        "codeImport.js",
+        "chairs.js",
+        "admin.js",
+        "tpback.js",
+        "weather.js",
+        "commandSigns.js",
+        "nightlight.js",
+        "goldenAxe.js"
+    ],
+    "verboseLogging": false
+}
