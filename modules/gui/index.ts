@@ -1,12 +1,14 @@
 import * as _ from 'underscore';
+import * as InventoryAction from '@org.bukkit.event.inventory.InventoryAction';
+import * as ClickType from '@org.bukkit.event.inventory.ClickType';
 
 let registeredGuis : any[] = [];
 
-export class Gui {
+export default class Gui {
 	_id: number;
 	_inventory: any[] = [];
-	_boundActions: { left: void, right: void, scope: any }[] = [];
-	_watchers: void[] = [];
+	_boundActions: { left: void, right: void, scope: Function }[] = [];
+	_watchers: Function[] = [];
 	_title: string = 'GUI';
 
 	constructor() {
@@ -72,10 +74,46 @@ export class Gui {
 	}
 
 	destroy() {
-		registeredGuis.slice(registeredGuis.indexOf(this), 1);
+		registeredGuis.slice(registeredGuis.indexOf(this), 0);
 	}
 }
 
 export function getGui(id) {
 	return _.find(registeredGuis, { _id: id });
 }
+
+registerEvent(inventory, 'click', (event) => {
+	for (let i = 0; i < registeredGuis.length; i++) {
+		var gui = registeredGuis[i];
+		if (event.getRawSlot() > gui.getInventorySize() - 1) continue;
+		if (gui._watchers.indexOf(event.getWhoClicked().getUniqueId()) > -1) {
+			if (event.getRawSlot() >= gui.getInventorySize()) return;
+			if (event.getAction() == InventoryAction.PLACE_ONE || event.getAction() == InventoryAction.PLACE_ALL || event.getAction() == InventoryAction.PLACE_SOME || event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT) {
+				event.cancelled = true;
+				return;
+			}
+			var boundItem = gui._boundActions[event.getCurrentItem()];
+			if (!boundItem) return;
+			if (event.getClick() == ClickType.LEFT && boundItem.left != undefined) {
+				boundItem.left(event.getWhoClicked(), boundItem.scope);
+				event.cancelled = true;
+				return;
+			}
+			if (event.getClick() == ClickType.RIGHT && boundItem.right != undefined) {
+				boundItem.right(event.getWhoClicked(), boundItem.scope);
+				event.cancelled = true;
+				return;
+			}
+		}
+	}
+});
+
+registerEvent(inventory, 'close', (event) => {
+	for (let i = 0; i < registeredGuis.length; i++) {
+		var gui = registeredGuis[i];
+		if (gui._watchers.indexOf(event.getPlayer().getUniqueId()) > -1) {
+			gui._watchers.slice(gui._watchers.indexOf(event.getPlayer().getUniqueId()), 0);
+			return;
+		}
+	}
+});

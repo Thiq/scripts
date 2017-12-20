@@ -1,19 +1,19 @@
 // An example of using the GUI to control weather.
-var Gui = require('gui').Gui;
+var Gui = require('gui');
 var weatherGui = new Gui();
 weatherGui.setTitle('Weather Master');
 weatherGui.add(itemStack(160, 1, 4), { name: '\xA7eSunny' },
     function(player) {
         player.world.setStorm(false);
         player.sendMessage('Set weather to sunny!');
-        weatherGui.close();
+        weatherGui.close(player);
     });
 weatherGui.add(itemStack(160, 1, 3), { name: '\xA7bLight rain' },
     function(player) {
         player.world.setStorm(true);
         player.world.setThundering(false);
         player.sendMessage('Set weather to light rain!');
-        weatherGui.close();
+        weatherGui.close(player);
     });
 weatherGui.add(itemStack(160, 1, 11), { name: '\xA79Stormy' },
     function(player) {
@@ -21,7 +21,7 @@ weatherGui.add(itemStack(160, 1, 11), { name: '\xA79Stormy' },
         player.world.setThundering(true);
         player.world.setThunderDuration(1000);
         player.sendMessage('Set weather to stormy!');
-        weatherGui.close();
+        weatherGui.close(player);
     });
 registerCommand({
     name: 'tweather',
