@@ -2,6 +2,7 @@
     "libraries": [
     	"helpers.js",
         "bukkitHelpers.js",
+        "greeting.js",
         "codeImport.js",
         "chairs.js",
         "admin.js",
