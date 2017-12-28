@@ -1,4 +1,3 @@
-
 var Thread = require('@java.lang.Thread');
 var Runnable = require('@java.lang.Runnable');
 var Bukkit = require('@org.bukkit.Bukkit');
@@ -12,7 +11,7 @@ var runnable = function(fn) {
     });
 };
 
-var async = function(fn, callback) {
+function async(fn, callback) {
     return scheduler.runTaskAsynchronously(getPlugin(), runnable(function() {
         var result;
         var error;
@@ -29,6 +28,6 @@ var async = function(fn, callback) {
             callback(result, error);
         }
     }));
-};
+}
 
 module.exports = async;

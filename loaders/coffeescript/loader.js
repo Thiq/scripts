@@ -11876,7 +11876,7 @@ this.CoffeeScript = function() {
     var exports = this;
     (function() {
       var CoffeeScript, runScripts;
-      CoffeeScript = require("./coffee-script"), CoffeeScript.require = require, CoffeeScript.eval = function(code, options) {
+      CoffeeScript = require("./coffee-script"), CoffeeScript.require = require, module.exports.compileFn = CoffeeScript.eval = function(code, options) {
         return eval(CoffeeScript.compile(code, options))
       }, CoffeeScript.run = function(a, b) {
         b == null && (b = {}), b.bare = !0;
@@ -11914,4 +11914,4 @@ this.CoffeeScript = function() {
     }).call(this)
   };
   return require["./coffee-script"]
-}()
+}();

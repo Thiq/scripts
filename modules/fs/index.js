@@ -11,6 +11,7 @@ var FileOutputStream = require('@java.io.FileOutputStream');
 var File = require('@java.io.File');
 var Files = require('@java.nio.file.Files');
 var path = require('path');
+var Buffer = require('buffer');
 
 exports.constants = {
     // file access
@@ -369,7 +370,7 @@ exports.read = function(location, buffer, offset, length, position, callback) {
 
         fIn.close();
         return string;
-    }).then(function(result){
+    }).then(function(result) {
         if (!callback) return;
         callback(undefined, result);
     }, function(err) {

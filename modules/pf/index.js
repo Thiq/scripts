@@ -11,24 +11,22 @@ var cacheDirectory;
 function Profile(uuid, tables) {
 	this._uuid = uuid;
 	this._tables = tables || {};
+}
 
-	this.set = function(table, property, value) {
-		if (!this._tables[table]) {
+Profile.prototype.set = function(table, property, value) {
+	if (!this._tables[table]) {
 			createTableForProfile(this._uuid, table);
 			this._tables[table] = {};
 		}
 		this._tables[table][property] = value;
 		saveProfileFor(this._uuid);
-	}
+}
 
-	this.get = function(table, property) {
-		if (!this._tables[table]) {
+Profile.prototype.get = function(table, property) {
+	if (!this._tables[table]) {
 			return undefined;
 		}
 		return this._tables[table][property];
-	}
-
-	return this;
 }
 
 function loadProfileFor(uuid) {

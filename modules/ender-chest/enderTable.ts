@@ -25,7 +25,7 @@ export class EnderTable {
 function loadTable(name: string): any {
     if (fs.exists(datadir + name + '.json')) {
         var data = fs.readFileSync(datadir + name + '.json') || {};
-        var JSONdata = JSON.parse(data);
+        var JSONdata = JSON.parse(data.toString());
         return JSONdata;
     }
     return undefined;

@@ -7,7 +7,7 @@ let registeredGuis : any[] = [];
 export default class Gui {
 	_id: number;
 	_inventory: any[] = [];
-	_boundActions: { left: void, right: void, scope: Function }[] = [];
+	_boundActions: any[] = [];
 	_watchers: Function[] = [];
 	_title: string = 'GUI';
 
@@ -24,7 +24,7 @@ export default class Gui {
 		return this;
 	}
 
-	add(item: any, options: any, leftClick: void, rightClick: void, scope: any, index: number) {
+	add(item: any, options: any, leftClick: Function, rightClick: Function, scope: any, index: number) {
 		if (options != null) {
 			let oldMeta = item.itemMeta;
 			oldMeta.displayName = options.name;

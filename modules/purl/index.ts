@@ -1,5 +1,5 @@
-import * as client from './purl-client/index';
-import * as server from './purl-server/index';
+import * as client from './client/index';
+import * as server from './server/index';
 
 export function Client() {
     return client();

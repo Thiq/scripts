@@ -1,15 +1,16 @@
 {
     "libraries": [
-    	"helpers.js",
-        "bukkitHelpers.js",
-        "greeting.js",
-        "codeImport.js",
+        "helpers.js",
+        "bukkit-helpers.js",
+        "code-import.js",
         "chairs.js",
         "admin.js",
+        "tpback.js",
         "weather.js",
-        "commandSigns.js",
-        "nightlight.js",
-        "goldenAxe.js"
+        "golden-axe.js",
+        "resource-signs.js",
+        "keycard.ts",
+        "play-time.js"
     ],
     "verboseLogging": false
 }
