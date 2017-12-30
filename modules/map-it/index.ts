@@ -6,10 +6,8 @@ import { MapView, MapCanvas, MapRenderer } from '@org.bukkit.map.MapView';
 function getMapForPlayer(player) {
   let map = new ItemStack(Material.MAP);
   let meta = map.getItemMeta();
-  let mapView = new MapView();
-  mapView.setCenterX(player.getLocation().x);
-  mapView.setCenterZ(player.getLocation().z);
-  mapView.setWorld(player.getWorld());
+  let renderer = new MapRenderer(true);
+
 }
 
 export function giveMap(player) {

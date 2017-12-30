@@ -11,7 +11,8 @@
         "resource-signs.js",
         "keycard.ts",
         "play-time.js",
-        "greeting.js"
+        "greeting.js",
+        "mention.js"
     ],
     "verboseLogging": false
 }
