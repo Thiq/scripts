@@ -50,7 +50,7 @@ var chairBlocks = [
 
 function isChair(block) {
     if (chairBlocks.indexOf(block.type) == -1) return false;
-    if (block.getRelative(BlockFace.BOTTOM).type == Material.DIAMOND_BLOCK) return true;
+    if (block.getRelative(BlockFace.DOWN).type == Material.DIAMOND_BLOCK) return true;
     var facing = block.getState().getData().getFacing();
     if (facing == BlockFace.NORTH || facing == BlockFace.SOUTH) {
         // check all blocks from west to east
