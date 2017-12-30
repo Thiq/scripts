@@ -3,7 +3,7 @@ import { ChatColor } from '@org.bukkit';
 import * as nms from 'nms';
 import { String } from '@java.lang';
 
-export class Title {
+export default class Title {
 	_header: string;
 	_sub: string;
 	_color: string = "white";
@@ -87,7 +87,7 @@ export class Title {
 		}
 	}
 
-	sendToAll() {
+	sendAll() {
 		var players = Bukkit.getOnlinePlayers();
 		for (let i = 0; i < players.length; i++) {
 			this.send(players[i]);
