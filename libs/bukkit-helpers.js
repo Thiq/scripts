@@ -1,3 +1,5 @@
+var p = require('placeholder');
+
 global.minecraft_item_regexes = [
     [/^air$/i, 0],
     [/^stone$/i, 1],
@@ -78,19 +80,27 @@ global.itemStack = function(id, amount, data, meta) {
     return item;
 }
 
-global.BlockInfo = function(block) {
-    var self = this;
+function BlockInfo(block) {
     this.id = block.typeId || block.id;
     this.data = block.durability || block.data;
     this.isSolid = block.type.solid || block.isSolid;
-
-    this.getBlock = function() {
-        return self.id;
-    }
 }
+
+BlockInfo.prototype.getBlock = function() {
+    return this.id;
+}
+
+global.BlockInfo = BlockInfo;
 
 global.defaultPermissionMessage = '\xA7cYou don\'t have permission to use that!';
 
 global.isPlayer = function(sender) {
     return sender.getDisplayName != undefined;
+}
+
+global.getNms = function(c) {
+    var version = Bukkit.getServer().getClass().getPackage().getName().split('.')[3];
+    var namespace = "net.minecraft.server.";
+    if (!c) return namespace + version;
+    else return Java.type(namespace + version + '.' + c);
 }

@@ -10,7 +10,8 @@
         "golden-axe.js",
         "resource-signs.js",
         "keycard.ts",
-        "play-time.js"
+        "play-time.js",
+        "greeting.js"
     ],
     "verboseLogging": false
 }
