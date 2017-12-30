@@ -1,5 +1,5 @@
 var Title = require('titles');
-var greetingsTitle = new Title('Hello!');
+var greetingsTitle = new Title('Welcome!');
 
 registerEvent(player, 'join', function(e) {
 	greetingsTitle.send(e.getPlayer());
