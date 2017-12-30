@@ -2,6 +2,10 @@ var Title = require('titles');
 var title = new Title().subColor('blue').stay(500);
 
 registerEvent(player, 'chat', function(e) {
+    doMention(e);
+});
+
+function doMention(e) {
     if (/\s\@\S\w/i.test(e.getMessage())) {
         var targets = e.getMessage().split(/\s\@\S\w/i);
         for (var i = 0; i < targets.length; i++) {
@@ -21,4 +25,4 @@ registerEvent(player, 'chat', function(e) {
             title.send(player);
         }
     }
-})
+}
