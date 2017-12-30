@@ -78,8 +78,10 @@ export default class Title {
 		var chatTitle = nms.get('IChatBaseComponent').class.getDeclaredClasses()[0].getMethod('a', String.class).invoke(null, titleText);
 		var chatSub = nms.get('IChatBaseComponent').class.getDeclaredClasses()[0].getMethod('a', String.class).invoke(null, subText);
 		var Packet = nms.get('PacketPlayOutTitle');
-		var titlePacket = new Packet(nms.get('PacketPlayOutTitle.EnumTitleAction').TITLE, chatTitle, this._fadeIn, this._stay, this._fadeOut);
-		nms.sendPacket(player, titlePacket);
+		if (this._header != undefined) {
+			var titlePacket = new Packet(nms.get('PacketPlayOutTitle.EnumTitleAction').TITLE, chatTitle, this._fadeIn, this._stay, this._fadeOut);
+			nms.sendPacket(player, titlePacket);
+		}
 		
 		if (this._sub != undefined) {
 			var subPacket = new Packet(nms.get('PacketPlayOutTitle.EnumTitleAction').SUBTITLE, chatSub, this._subFadeIn || this._fadeIn, this._subStay || this._stay, this._subFadeOut || this._fadeOut);
