@@ -14,9 +14,8 @@ export class Profile {
 
 	set(table: string, property: string, value: any) {
 		if (!this._tables[table]) {
-			this._tables = {};
-		} 
-		this._tables[table] = {};
+			this._tables[table] = {};
+		}
 		this._tables[table][property] = value;
 		// save the profile
 		this.save();

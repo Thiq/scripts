@@ -30,17 +30,15 @@ function notifyPlayers(e, targets) {
 
 function hasNotificationsEnabled(player) {
     var profile = pf.getProfile(player.getUniqueId());
-    if (profile.get('mentions', 'isEnabled') === true || !profile.get('mentions')) {
-        return true;
-    } else {
-        return false;
-    }
+    return profile.get('mentions', 'isEnabled') === true;
 }
 
 registerCommand({
     name: 'mentions',
     description: 'Manages player mention notifications',
-    usage: '\xA7eUsage: /mentions [on|off]'
+    usage: '\xA7eUsage: /mentions [on|off]',
+    permission: registerPermission('thiq.mentions.toggle', true),
+    permissionMessage: defaultPermissionMessage
 }, function(sender, label, args) {
     if (!args || args.length == 0) {
         sender.sendMessage('Incorrect usage: /mentions [on|off]');
@@ -50,5 +48,7 @@ registerCommand({
         sender.sendMessage('Only players can call mentions');
         return;
     }
-    pf.getProfile(sender.getUniqueId()).set('mentions', args[0].toLowerCase() == 'on');
+    var turnOn = args[0].toLowerCase() == 'on';
+    pf.getProfile(sender.getUniqueId()).set('mentions', 'isEnabled', turnOn);
+    sender.sendMessage('\xA7eTurned notifications ' + (turnOn ? 'on' : 'off'));
 });
