@@ -25,6 +25,7 @@ function notifyPlayers(e, targets) {
         var sentBy = e.getPlayer().getPlayerListName();
         title.title(sentBy + ' mentioned you');
         title.send(player);
+        player.playNote(player.getLocation(), org.bukkit.Instrument.CHIME, org.bukkit.Note.natural(1, (org.bukkit.Note.Tone.C)));
     }
 }
 
