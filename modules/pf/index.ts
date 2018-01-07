@@ -6,7 +6,7 @@ let profileDir : string;
 
 export class Profile {
 	_uuid: string;
-	_tables: any;
+	_tables: any = {};
 
 	constructor(uuid: string) {
 		this._uuid = uuid;
@@ -14,9 +14,8 @@ export class Profile {
 
 	set(table: string, property: string, value: any) {
 		if (!this._tables[table]) {
-			this._tables = {};
-		} 
-		this._tables[table] = {};
+			this._tables[table] = {};
+		}
 		this._tables[table][property] = value;
 		// save the profile
 		this.save();
@@ -35,17 +34,17 @@ export class Profile {
 	}
 
 	load() {
-		var self = loadProfile(this._uuid);
+		var self = getProfile(this._uuid);
 		this._tables = self._tables;
 		return this;
 	}
 }
 
-export function loadProfile(uuid: string) : Profile {
+export function getProfile(uuid: string) : Profile {
 	if (!cachedProfiles[uuid]) {
 		var path = getPathFor(uuid);
 		var profile = new Profile(uuid);
-		profile._tables = JSON.parse(fs.readFileSync(path));
+		profile._tables = JSON.parse(fs.readFileSync(path) || '{}');
 		cachedProfiles[uuid] = profile;
 	}
 	return cachedProfiles[uuid];
