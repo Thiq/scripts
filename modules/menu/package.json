@@ -1,4 +1,0 @@
-{
-    "loader": "typescript",
-    "main": "chat-menu.ts"
-}
