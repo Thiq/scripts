@@ -1,4 +1,4 @@
-export class EventHandler{
+export class EventHandler {
     registeredHandlers = [];
 
     constructor() {
@@ -8,7 +8,7 @@ export class EventHandler{
     register(handler, name, event) {
         var cancellationToken = registerEvent(handler, name, function() {
             event.apply(self, arguments);
-        })
+        });
         var registration = new EventRegistration(handler, name, cancellationToken);
         this.registeredHandlers.push(registration);
         return this;
