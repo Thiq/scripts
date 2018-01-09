@@ -8,10 +8,10 @@ questableNpc('MyNpc')
 				'How are you this fine day?',
 				'Can you run some tasks for me?'
 			])
-			.break(5, 'cobblestone') // requests you break 5 cobblestone
-			.craft(1, 'wooden pickaxe') // requests you craft a wooden pickaxe
-			.kill(2, 'zombies') // requests you kill 2 zombies
-			.fish(3, 'salmon') // requests you fish 2 salmon
+			.break(5, Material.COBBLESTONE) // requests you break 5 cobblestone. Accepts an ItemStack object as well
+			.craft(1, Material.WOOD_PICKAXE) // requests you craft a wooden pickaxe. Accepts an ItemStack object as well.
+			.kill(2, 'zombie') // requests you kill 2 zombies
+			.fish(3) // requests you get 2 fish
 			.grow(1, 'potato') // requests you grow a potato
 			.smelt(10, 'iron ingots') // requests you smelt 10 iron ingots
 			.locate(npc({
@@ -21,22 +21,22 @@ questableNpc('MyNpc')
 			.reward(20, 'diamonds') // rewards with 20 diamonds
 			.plays(1) // players can only play it once
 			.timeLimit(2, 'days') // the player has 2 days to complete
-	)
+	);
 */
 import * as MDate from 'mdate';
 
-export const QuestActions = [
-  'break',
-	'place',
-	'craft',
-	'grow',
-	'fish',
-	'kill',
-	'breed',
-	'collect',
-	'smelt',
-	'locate'
-];
+export enum QuestActions {
+  BREAK,
+  PLACE,
+  CRAFT,
+  GROW,
+  FISH,
+  KILL,
+  BREED,
+  COLLECT,
+  SMELT,
+  LOCATE
+}
 
 export class Quest {
   name: string;
@@ -53,27 +53,27 @@ export class Quest {
     this.name = name;
   }
 
-  _addQuestAction(action, count, target) {
-    this._actions.push(new QuestAction(action, count, target));
+  _addQuestAction(action: QuestActions, count, target?, args = []) {
+    this._actions.push(new QuestAction(action, count, target, args));
   }
 
   /**
    * Adds a break action requirement to the quest.
-   * @param count 
-   * @param target 
+   * @param { number } count
+   * @param { ItemStack | Material } target
    */
-  break(count: number, target: string): Quest {
-    this._addQuestAction('break', count, target);
+  break(count: number, target): Quest {
+    this._addQuestAction(QuestActions.BREAK, count, target);
     return this;
   }
 
   /**
    * Adds a place action requirement to the quest.
-   * @param count 
-   * @param target 
+   * @param { number } count
+   * @param { ItemStack | Material } target 
    */
-  place(count: number, target: string): Quest {
-    this._addQuestAction('place', count, target);
+  place(count: number, target, args): Quest {
+    this._addQuestAction(QuestActions.PLACE, count, target, args);
     return this;
   }
 
@@ -82,8 +82,8 @@ export class Quest {
    * @param count 
    * @param target 
    */
-  craft(count: number, target: string): Quest {
-    this._addQuestAction('craft', count, target);
+  craft(count: number, target): Quest {
+    this._addQuestAction(QuestActions.CRAFT, count, target);
     return this;
   }
 
@@ -92,8 +92,8 @@ export class Quest {
    * @param count
    * @param target
    */
-  grow(count: number, target: string): Quest {
-    this._addQuestAction('grow', count, target);
+  grow(count: number, target): Quest {
+    this._addQuestAction(QuestActions.GROW, count, target);
     return this;
   }
 
@@ -102,8 +102,8 @@ export class Quest {
    * @param count
    * @param target
    */
-  fish(count: number, target: string): Quest {
-    this._addQuestAction('fish', count, target);
+  fish(count: number): Quest {
+    this._addQuestAction(QuestActions.FISH, count);
     return this;
   }
 
@@ -112,8 +112,8 @@ export class Quest {
    * @param count 
    * @param target 
    */
-  kill(count: number, target: string): Quest {
-    this._addQuestAction('kill', count, target);
+  kill(count: number, target): Quest {
+    this._addQuestAction(QuestActions.KILL, count, target);
     return this;
   }
 
@@ -122,8 +122,8 @@ export class Quest {
    * @param count
    * @param target 
    */
-  breed(count: number, target: string): Quest {
-    this._addQuestAction('breed', count, target);
+  breed(count: number, target): Quest {
+    this._addQuestAction(QuestActions.BREED, count, target);
     return this;
   }
 
@@ -132,8 +132,8 @@ export class Quest {
    * @param count 
    * @param target 
    */
-  collect(count: number, target: string): Quest {
-    this._addQuestAction('collect', count, target);
+  collect(count: number, target): Quest {
+    this._addQuestAction(QuestActions.COLLECT, count, target);
     return this;
   }
 
@@ -142,8 +142,18 @@ export class Quest {
    * @param count 
    * @param target 
    */
-  smelt(count: number, target: string): Quest {
-    this._addQuestAction('smelt', count, target);
+  smelt(count: number, target): Quest {
+    this._addQuestAction(QuestActions.SMELT, count, target);
+    return this;
+  }
+
+  /**
+   * Adds a locate action requirement to the quest.
+   * @param count 
+   * @param target 
+   */
+  locate(count: number, target): Quest {
+    this._addQuestAction(QuestActions.LOCATE, count, target);
     return this;
   }
 
@@ -229,15 +239,17 @@ export class QuestableNpc {
   }
 }
 
-class QuestAction {
+export class QuestAction {
   action;
   count;
   target;
+  args;
 
-  constructor(action, count, target) {
+  constructor(action, count, target, args = []) {
     this.action = action;
     this.count = count;
     this.target = target;
+    this.args = args;
   }
 }
 

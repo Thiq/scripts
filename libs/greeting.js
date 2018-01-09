@@ -1,6 +1,6 @@
-var Title = require('titles').Title;
-var greetingsTitle = new Title('Welcome!');
+var quests = require('quests');
+var Quest = quests.types().Quest;
 
 registerEvent(player, 'join', function(e) {
-	greetingsTitle.send(e.getPlayer());
+	quests.factory().QuestFactory.assignQuest(e.getPlayer(), new Quest("The Magus's Garden").collect(3, org.bukkit.Material.SUGAR_CANE));
 });

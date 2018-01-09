@@ -29,7 +29,7 @@ export function verifyVersion(data: VersioningData, url: string): Promise<boolea
 	});
 }
 
-function isValidJson(json: JSON): boolean {
+function isValidJson(json): boolean {
 	if (!json.version.major) return false;
 	if (!json.version.minor) return false;
 	if (!json.version.sub) return false;

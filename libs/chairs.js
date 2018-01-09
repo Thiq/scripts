@@ -16,6 +16,7 @@ registerEvent(player, 'interact', function(event) {
         e.setSilent(true);
         e.setVisible(false);
         e.setGravity(false);
+        e.setInvulnerable(true);
     });
     en.addPassenger(event.player);
     doChairUpdate(event, oldLocation, en);

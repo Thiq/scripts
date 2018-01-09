@@ -12,7 +12,7 @@ var XpReward = createReward(function(player) {
 */
 
 function createRewardGiveAction(item) {
-	return function(player) {
+	return (player) => {
 		player.giveItem(item);
 	}
 }
