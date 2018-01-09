@@ -1,5 +1,5 @@
 # Titles
-A simple module to create titles for in-game.
+>A simple module to create titles for in-game.
 
 ## How do I use it?
 ```

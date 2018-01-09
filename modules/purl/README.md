@@ -13,11 +13,13 @@ myHttpClient.get('https://google.com').then(function(result) {
     console.error(err);
 });
 
-myHttpClient.put('https://myurl.com', { params: 'Hello world!', headers: { content: 'application/json' } }).then(function(result) {
+myHttpClient.post('https://myurl.com', { params: 'Hello world!', headers: { content: 'application/json' } })
+.then(function(result) {
     ...
 });
 
-myHttpClient.post('https://myurl.com', { params: 'Updating!' }).then(function(result) {
+myHttpClient.put('https://myurl.com', { params: 'Updating!' })
+.then(function(result) {
     ...
 });
 
