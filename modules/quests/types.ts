@@ -53,8 +53,8 @@ export class Quest {
     this.name = name;
   }
 
-  _addQuestAction(action: QuestActions, count, target?) {
-    this._actions.push(new QuestAction(action, count, target));
+  _addQuestAction(action: QuestActions, count, target?, args = []) {
+    this._actions.push(new QuestAction(action, count, target, args));
   }
 
   /**
@@ -72,8 +72,8 @@ export class Quest {
    * @param { number } count
    * @param { ItemStack | Material } target 
    */
-  place(count: number, target): Quest {
-    this._addQuestAction(QuestActions.PLACE, count, target);
+  place(count: number, target, args): Quest {
+    this._addQuestAction(QuestActions.PLACE, count, target, args);
     return this;
   }
 
@@ -243,11 +243,13 @@ export class QuestAction {
   action;
   count;
   target;
+  args;
 
-  constructor(action, count, target) {
+  constructor(action, count, target, args = []) {
     this.action = action;
     this.count = count;
     this.target = target;
+    this.args = args;
   }
 }
 
