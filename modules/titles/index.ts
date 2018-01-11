@@ -4,16 +4,16 @@ import * as nms from 'nms';
 import { String } from '@java.lang';
 
 export class Title {
-	_header: string = '';
-	_sub: string;
-	_color: string = "white";
-	_subColor: string = "white";
-	_fadeIn: number = 50;
-	_subFadeIn: number = 50;
-	_stay: number = 2000;
-	_subStay: number = undefined;
-	_fadeOut: number = undefined;
-	_subFadeOut: number = undefined;
+	private _header: string = '';
+	private _sub: string;
+	private _color: string = "white";
+	private _subColor: string = "white";
+	private _fadeIn: number = 50;
+	private _subFadeIn: number = 50;
+	private _stay: number = 2000;
+	private _subStay: number = undefined;
+	private _fadeOut: number = undefined;
+	private _subFadeOut: number = undefined;
 
 	constructor(header?: string, sub?: string) {
 		this._header = header;
@@ -78,11 +78,11 @@ export class Title {
 		var chatTitle = nms.get('IChatBaseComponent').class.getDeclaredClasses()[0].getMethod('a', String.class).invoke(null, titleText);
 		var chatSub = nms.get('IChatBaseComponent').class.getDeclaredClasses()[0].getMethod('a', String.class).invoke(null, subText);
 		var Packet = nms.get('PacketPlayOutTitle');
-		var titlePacket = new Packet(nms.get('PacketPlayOutTitle.EnumTitleAction').TITLE, chatTitle, this._fadeIn, this._stay, this._fadeOut);
+		var titlePacket = new Packet(Packet.EnumTitleAction.TITLE, chatTitle, this._fadeIn, this._stay, this._fadeOut);
 		nms.sendPacket(player, titlePacket);
 		
 		if (this._sub != undefined && this._sub.length > 0) {
-			var subPacket = new Packet(nms.get('PacketPlayOutTitle.EnumTitleAction').SUBTITLE, chatSub, this._subFadeIn || this._fadeIn, this._subStay || this._stay, this._subFadeOut || this._fadeOut);
+			var subPacket = new Packet(Packet.EnumTitleAction.SUBTITLE, chatSub, this._subFadeIn || this._fadeIn, this._subStay || this._stay, this._subFadeOut || this._fadeOut);
 			nms.sendPacket(player, subPacket);
 		}
 	}
@@ -137,7 +137,7 @@ export class ActionBarTitle {
 		var titleText = p(tjson, this.text, this._color.toLowerCase());
 		var chatTitle = nms.get('IChatBaseComponent').class.getDeclaredClasses()[0].getMethod('a', String.class).invoke(null, titleText);
 		var Packet = nms.get('PacketPlayOutTitle');
-		var titlePacket = new Packet(nms.get('PacketPlayOutTitle.EnumTitleAction').ACTIONBAR, chatTitle, this._fadeIn, this._stay, this._fadeOut);
+		var titlePacket = new Packet(Packet.EnumTitleAction.ACTIONBAR, chatTitle, this._fadeIn, this._stay, this._fadeOut);
 		nms.sendPacket(player, titlePacket);
 	}
 

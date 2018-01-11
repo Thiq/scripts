@@ -1,257 +1,168 @@
-/*
-This file is responsible for allowing players to join, follow, finish, and leave quests.
-It's in charge of tracking completion and data as well.
-*/
+// take 2 at this whole shebang.
+// the factory will manage all quests in progress for all players
 
-import { Quest, QuestableNpc, QuestAction, QuestActions, QuestStatus, PlayerQuestStatus } from './types';
+import { Quest } from './quest';
+import { QuestType } from './quest-actions';
+import { QuestReward } from './rewards';
+import { QuestObjective } from './objective';
 import * as Scoreboard from 'scoreboard';
-import * as guid from 'guid';
+import * as _ from 'underscore';
+import * as enderChest from 'ender-chest';
+import { Title } from 'titles';
+
+let C2 = Bukkit.getPluginManager().getPlugin('Citizens');
+let npcRegistry = C2.getNPCRegistry();
+let npcSpeech = C2.getSpeechFactory();
+
+export { Quest as Quest };
+export { QuestType as QuestType };
+export { QuestReward as QuestReward };
+export { QuestObjective as QuestObjective };
 
 export class QuestFactory {
-    static quests: QuestContainer[] = [];
+    /**
+     * An object of { playerUUID: Quest }
+     */
+    registeredQuests = {};
+    /**
+     * An object of { playerUUID: questUUID }
+     */
+    activeQuests = {};
+    /**
+     * An object of { playerUUID: questUUID[] }
+     */
+    completedQuests = {};
+    /**
+     * An object of { npcID: questUUID[] }
+     */
+    registeredNpcs = {};
 
-    static assignQuest(player, quest: Quest) {
-        for (var i = 0; i < this.quests.length; i++) {
-            if (!this.quests[i]) continue;
-            if (this.quests[i].player.getUniqueId() == player.getUniqueId()) {
-                this.quests[i].destroy();
-                this.quests.splice(i, 1);
+    table = enderChest.getTable('quests');
+
+    constructor() {
+        
+    }
+
+    initializeHandlers() {
+        registerEvent(player, 'intractEntity', (e) => {
+            if (e.getRightClicked().class == org.bukkit.entity.LivingEntity.class) {
+                let npc = npcRegistry.getNPC(e.getRightClicked());
+                if (!npc) return;
+                let foundEntity = this.registeredNpcs[npc.getUniqueId()];
+                if (!foundEntity) return;
+                if (this.activeQuests[e.getPlayer().getUniqueId()] != undefined) return;
+                let playerCompleteStatus = this.completedQuests[e.getPlayer().getUniqueId()];
+                // iterate through the NPCs tied quests to get the next one that hasn't been completed.
+                let foundNextQuest = undefined;
+                for (let i = 0; i < foundEntity.length; i++) {
+                    var questID = foundEntity[i];
+                    if (playerCompleteStatus.indexOf(questID) > -1) continue;
+                    foundNextQuest = questID;
+                }
+                // if foundNextQuest == false, then the player has completed all quests with this NPC
+                if (!foundNextQuest) return;
+                this.addQuester(e.getPlayer(), foundNextQuest);
             }
-        }
-        this.quests.push(new QuestContainer(quest, player));
+        });
     }
-}
 
-function normalizeItemName(material) {
-    return material.toString().replace('_', ' ').toLowerCase();
-}
+    createNpc(type, name: string) {
+        var npc = npcRegistry.createNpc(type, name);
+        this.registeredNpcs[npc.getUniqueId().toString()] = [];
+        return npc;
+    }
 
-/* fuck this is gonna suck. Ok, here it goes:
-When the quest is assigned, it'll create an event handler for the player. Once that QuestAction is complete,
-it'll then create another for the next, so on so forth until the quest is complete. Once it is, it'll call reward() 
-and register a handler to talk to the NPC that assigned the quest.
-*/
+    addQuest(quest: Quest) {
+        if (this.registeredQuests[quest.id] != undefined) throw new Error('A quest with that ID already exists');
+        this.registeredQuests[quest.id] = quest;
+    }
 
-class QuestContainer {
-    currentInc: number = 0;
-    quest: Quest;
-    questWatchers: QuestActionWatcher[] = [];
-    player;
-    id: string;
-    scoreboard: Scoreboard;
-
-    constructor(quest: Quest, player) {
-        this.player = player;
-        this.quest = quest;
-        this.id = guid();
-        this.scoreboard = new Scoreboard('\xA7e' + quest.name);
-        for (let i = 0; i < quest._actions.length; i++) {
-            var action = quest._actions[i];
-            this.scoreboard.addEntry(QuestActions[action.action].toLowerCase() + ' ' + action.count + ' ' + normalizeItemName(action.target));
+    addQuester(player, questID) {
+        if (!this.registeredQuests[questID]) throw new Error('A quest with that ID does not exist');
+        if (this.activeQuests[player.getUniqueId()] != undefined && 
+            !this.activeQuests[player.getUniqueId()].isCompleted) {
+            throw new Error('This player is already embarked on a quest');
+        } else {
+            this.activeQuests[player.getUniqueId()] = undefined;
         }
-        this.scoreboard.send(player);
-        this.questWatchers = quest._actions.map((s) => new QuestActionWatcher(player, s, 
-        () => {
-            this.currentInc++;
-            if (this.currentInc <= this.quest._actions.length)
-                this.beginWatch(this.getCurrentObjective());
-        },
-        (value) => {
-            this.scoreboard().setEntry(this.currentInc, value);
+        this.activeQuests[player.getUniqueId()] = new QuestStatus(player.getUniqueId(), this.registeredQuests[questID]);
+        let quest = this.registeredQuests[questID];
+        let questTitle = new Title('New Quest:', quest.name)
+                    .color('red')
+                    .subColor('yellow')
+                    .fadeIn(300)
+                    .subFadeIn(1000)
+                    .stay(1000)
+                    .subStay(1000)
+                    .fadeOut(1000)
+                    .subFadeOut(1000);
+                questTitle.send(player);
+    }
+
+    saveQuester(playerID) {
+        // to save a quest point, we need:
+        // - player UUID
+        // - quest UUID
+        // - an array of the current counts of objectives
+        // Simple, yes?
+        var status = this.activeQuests[playerID] as QuestStatus;
+        if (!status || status.isCompleted) return false;
+        var savePoint = new QuestSavePoint(playerID, status.quest, status.objectives.map(e => {
+            return e.currentCount;
         }));
-        this.beginWatch(this.questWatchers[0]);
+        return savePoint;
     }
 
-    getCurrentObjective(): QuestActionWatcher {
-        return this.questWatchers[this.currentInc];
-    }
-
-    getNextObjective(): QuestActionWatcher {
-        return this.questWatchers[this.currentInc + 1];
-    }
-
-    isComplete() {
-        return this.currentInc > this.questWatchers.length;
-    }
-
-    beginWatch(watcher: QuestActionWatcher) {
-        switch (watcher.questAction.action) {
-            case QuestActions.BREAK:
-                watcher.watchBreak();
-                break;
-            case QuestActions.BREED:
-                watcher.watchBreed();
-                break;
-            case QuestActions.COLLECT:
-                watcher.watchCollect();
-                break;
-            case QuestActions.CRAFT:
-                watcher.watchCraft();
-                break;
-            case QuestActions.FISH:
-                watcher.watchFish();
-                break;
-            case QuestActions.GROW:
-                watcher.watchGrow();
-                break;
-            case QuestActions.KILL:
-                watcher.watchKill();
-                break;
-            case QuestActions.LOCATE:
-                watcher.watchLocate();
-                break;
-            case QuestActions.PLACE:
-                watcher.watchPlace();
-                break;
-            case QuestActions.SMELT:
-                watcher.watchSmelt();
-                break;
-        }
-    }
-
-    destroy() {
-        this.questWatchers[this.currentInc].destroy();
-        this.questWatchers = [];
-        this.scoreboard.destroy();
+    loadQuester(save: QuestSavePoint) {
+        var quest = 
+        this.activeQuests[save.playerUUID]
     }
 }
 
 /**
- * A wrapper around an individual objective of a quest.
+ * Represents a save point of a quest.
  */
-class QuestActionWatcher {
-    cancelToken = null;
-    count: number = 0;
-    questAction: QuestAction;
+export class QuestSavePoint {
+    playerUUID: string;
+    questUUID: string;
+    objStates: number[] = [];
+
+    constructor(playerUUID: string, questUUID: string, objStates: number[]) {
+        this.playerUUID = playerUUID;
+        this.questUUID = questUUID;
+        this.objStates = objStates;
+    }
+}
+
+
+export class QuestStatus {
     player;
-    watchComplete: Function;
-    increment: Function;
+    objectives: QuestObjective[];
+    scoreboard: Scoreboard;
+    quest: string;
+    isCompleted: boolean = false;
 
-    constructor(player, questAction: QuestAction, watchComplete?: Function, increment?: Function) {
-        this.player = player;
-        this.questAction = questAction;
-        this.watchComplete = watchComplete;
-        this.increment = increment;
-    }
-
-    watchBreak() {
-        this.cancelToken = registerEvent(block, 'bbreak', (e) => {
-            if (this.player.getUniqueId() != e.getPlayer().getUniqueId()) return;
-            if (e.getBlock().type == this.questAction.target) this.count++; 
-            if (e.getBlock().type == this.questAction.target.type) this.count++;
-            if (this.count >= this.questAction.count) {
-                unregisterEvent(this.cancelToken);
-            }
-        });
-    }
-
-    watchPlace() {
-        throw new Error('watchPlace is not implemented');
-    }
-
-    watchCraft() {
-        this.cancelToken = registerEvent(inventory, 'craft', (e) => {
-            if (e.getViewers()[0].getUniqueId() != this.player.getUniqueId()) return;
-            var result = e.getInventory().getResult();
-            if (result.type == this.questAction.target) {
-                this.count++;
-                this.onIncrement();
-            }
-            if (result.type == this.questAction.target.type) {
-                this.count++;
-                this.onIncrement();
-            }
-            if (this.count >= this.questAction.count) {
-                unregisterEvent(this.cancelToken);
-            }
-        });
-    }
-
-    watchGrow() {
-        throw new Error('watchGrow is not implemented');
-    }
-
-    watchFish() {
-        this.cancelToken = registerEvent(player, 'fish', (e) => {
-            if (e.getPlayer().getUniqueId() != this.player.getUniqueId()) return;
-            this.count++;
-            this.onIncrement();
-            if (this.count >= this.questAction.count) {
-                unregisterEvent(this.cancelToken);
-            }
-        });
-    }
-
-    watchKill() {
-        this.cancelToken = registerEvent(entity, 'death', (e) => {
-            if (e.getEntity().getKiller() == null || e.getEntity().getKiller().getUniqueId() != this.player.getUniqueId()) return;
-            if (e.getEntityType() == this.questAction.target) {
-                this.count++;
-                this.onIncrement();
-            }
-            
-            if (this.count >= this.questAction.count) {
-                unregisterEvent(this.cancelToken);
-            }
-        });
-    }
-
-    watchBreed() {
-        this.cancelToken = registerEvent(entity, 'breed', (e) => {
-            if (e.getBreeder().getUniqueId == undefined || e.getBreeder().getUniqueId() != this.player.getUniqueId()) return;
-            if (e.getEntityType() == org.bukkit.entity.EntityType.valueOf(this.questAction.target)) {
-                this.count++;
-                this.onIncrement();
-            }
-            if (e.getEntityType() == this.questAction.target) {
-                this.count++;
-                this.onIncrement();
-            }
-            if (this.count >= this.questAction.count) {
-                unregisterEvent(this.cancelToken);
-            }
-        });
-    }
-
-    watchCollect() {
-        this.cancelToken = registerEvent(inventory, 'pickupItem', (e) => {
-            if (this.player.getInventory().contains(this.questAction.target, this.questAction.count)) {
-                if (this.count >= this.questAction.count) {
-                    unregisterEvent(this.cancelToken);
-                    this.onIncrement();
+    constructor(playerUUID, quest: Quest) {
+        this.player = Bukkit.getPlayer(playerUUID);
+        this.objectives = quest.objectives.slice(0);
+        this.scoreboard = new Scoreboard(`\xA7e${quest.name}`);
+        this.quest = quest.id;
+        for (let i = 0; i < this.objectives.length; i++) {
+            let obj = this.objectives[i];
+            this.scoreboard.addEntry(`${QuestType[obj.type].toLowerCase()} ${obj.count} ${obj.target.toString().toLowerCase().replace('_', ' ')}`);
+            obj.on('$progress', (sender, args) => {
+                this.scoreboard.setEntry(i, sender._currentCount);
+            });
+            obj.on('$completed', (sender, args) => {
+                this.scoreboard.destroy();
+                quest.reward.giveTo(this.player);
+                for (let j = 0; j < quest.npcSpeechFinish.length; j++) {
+                    this.player.sendMessage(quest.npcSpeechFinish[j]);
                 }
-            }
-        });
-    }
-
-    watchSmelt() {
-        this.cancelToken = registerEvent(inventory, 'extract', (e) => {
-            if (e.getItemType() == this.questAction.target) {
-                this.count += e.getItemAmount();
-                this.onIncrement();
-            }
-            if (this.count >= this.questAction.count) {
-                unregisterEvent(this.cancelToken);
-            }
-        });
-    }
-
-    watchLocate() {
-        this.cancelToken = registerEvent(player, 'move', (e) => {
-            // this one is dangerous, so lets make it as lightweight as possible
-            if (e.getTo().distanceSquared(this.questAction.target) < 10) unregisterEvent(this.cancelToken);
-        })
-    }
-
-    onWatchComplete() {
-        this.watchComplete(this.player, this.questAction);
-    }
-
-    onIncrement() {
-        this.increment(this.count);
-    }
-
-    destroy() {
-        unregisterEvent(this.cancelToken);
+                this.isCompleted = true;
+            });
+            obj.beginWatch(this.player);
+        }
+        if (quest.showScoreboard) this.scoreboard.send(this.player);
     }
 }

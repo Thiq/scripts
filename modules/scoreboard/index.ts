@@ -8,7 +8,7 @@ export default class Scoreboard {
 
     constructor(name: string) {
         this._sb = Bukkit.getScoreboardManager().getNewScoreboard();
-        this._id = guid().substring(0, 16);
+        this._id = guid().toString().substring(0, 16);
         this._scores = [];
         this._obj = this._sb.registerNewObjective(this._id, name);
         this._obj.setDisplaySlot(org.bukkit.scoreboard.DisplaySlot.SIDEBAR);

@@ -1,6 +1,8 @@
 var quests = require('quests');
-var Quest = quests.types().Quest;
+var factory = new quests.QuestFactory();
+var testQuest = new quests.Quest('Test Quest').break(org.bukkit.Material.STONE, 4);
+factory.addQuest(testQuest);
 
 registerEvent(player, 'join', function(e) {
-	quests.factory().QuestFactory.assignQuest(e.getPlayer(), new Quest("The Magus's Garden").collect(3, org.bukkit.Material.SUGAR_CANE));
+    factory.addQuester(e.getPlayer(), testQuest.id);
 });

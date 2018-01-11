@@ -10,17 +10,22 @@ var XpReward = createReward(function(player) {
 	player.giveXp(10);
 })
 */
+import { ItemStack } from '@org.bukkit.inventory';
 
-function createRewardGiveAction(item) {
-	return (player) => {
-		player.giveItem(item);
+/**
+ * A wrapper around a reward object for a quest.
+ */
+export class QuestReward {
+	items: ItemStack[] = [];
+	xp: number = 0;
+	
+	constructor(options: any) {
+		this.items = options.items;
+		this.xp = options.xp;
 	}
-}
 
-export function createReward(reward) {
-	if (typeof reward != 'function') {
-		return createRewardGiveAction(reward);
-	} else {
-		return reward;
+	giveTo(player) {
+		player.getInventory().add(this.items);
+		player.giveExp(this.xp);
 	}
 }
