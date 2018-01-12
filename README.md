@@ -7,6 +7,8 @@
 Core files are loaded first, then lib files, while modules are loaded dynamically as needed.
 
 ## How to create a Thiq Package:
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FThiq%2Fscripts.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2FThiq%2Fscripts?ref=badge_shield)
+
 Your directory can have 2 different layouts. Your package will be searched for via `require` with the same directory name.
 `./modules/example/index.js`
 `./modules/example/[Filename from package.json[main]]`
@@ -44,3 +46,6 @@ While some npm packages are compatible, most may not be. This is due to the fact
 
 ### Loading structure:
 `plugin.js` is the entry point for Thiq. It loads all of the core libraries and all of the `thiq.json.libraries` array. `startup.js` is used to initialize any code and libraries that needs to be available at runtime.
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2FThiq%2Fscripts.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2FThiq%2Fscripts?ref=badge_large)
