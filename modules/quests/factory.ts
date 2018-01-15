@@ -8,11 +8,16 @@ import { QuestObjective } from './objective';
 import * as Scoreboard from 'scoreboard';
 import * as _ from 'underscore';
 import * as enderChest from 'ender-chest';
+import * as pf from 'pf';
 import { Title } from 'titles';
 
 let C2 = Bukkit.getPluginManager().getPlugin('Citizens');
 let npcRegistry = C2.getNPCRegistry();
 let npcSpeech = C2.getSpeechFactory();
+
+const completePrefix = '\xA7a✔';
+const incompletePrefix = '\xA7c✘';
+const table = enderChest.getTable('quests');
 
 export { Quest as Quest };
 export { QuestType as QuestType };
@@ -25,7 +30,7 @@ export class QuestFactory {
      */
     registeredQuests = {};
     /**
-     * An object of { playerUUID: questUUID }
+     * An object of { playerUUID: QuestStatus }
      */
     activeQuests = {};
     /**
@@ -37,9 +42,18 @@ export class QuestFactory {
      */
     registeredNpcs = {};
 
-    table = enderChest.getTable('quests');
-
     constructor() {
+        // we have to wait until Thiq is finished loading so that all scripts can finish adding
+        // their quests.
+        registerEvent(server, 'pluginEnabled', (e) => {
+            if (e.getPlugin() == getPlugin()) {
+                var players = Bukkit.getOnlinePlayers();
+                for (let i = 0; i < players.length; i++) {
+                    var player = players[i];
+                    this.loadQuester(player);
+                }
+            }
+        });
         
     }
 
@@ -55,9 +69,9 @@ export class QuestFactory {
                 // iterate through the NPCs tied quests to get the next one that hasn't been completed.
                 let foundNextQuest = undefined;
                 for (let i = 0; i < foundEntity.length; i++) {
-                    var questID = foundEntity[i];
-                    if (playerCompleteStatus.indexOf(questID) > -1) continue;
-                    foundNextQuest = questID;
+                    var questName = foundEntity[i];
+                    if (playerCompleteStatus.indexOf(questName) > -1) continue;
+                    foundNextQuest = questName;
                 }
                 // if foundNextQuest == false, then the player has completed all quests with this NPC
                 if (!foundNextQuest) return;
@@ -73,19 +87,19 @@ export class QuestFactory {
     }
 
     addQuest(quest: Quest) {
-        if (this.registeredQuests[quest.id] != undefined) throw new Error('A quest with that ID already exists');
-        this.registeredQuests[quest.id] = quest;
+        if (this.registeredQuests[quest.name] != undefined) throw new Error('A quest with that ID already exists');
+        this.registeredQuests[quest.name] = quest;
     }
 
     addQuester(player, questID) {
-        if (!this.registeredQuests[questID]) throw new Error('A quest with that ID does not exist');
+        if (!this.registeredQuests[questID]) throw new Error(`A quest with the ID ${questID} does not exist`);
         if (this.activeQuests[player.getUniqueId()] != undefined && 
             !this.activeQuests[player.getUniqueId()].isCompleted) {
             throw new Error('This player is already embarked on a quest');
         } else {
             this.activeQuests[player.getUniqueId()] = undefined;
         }
-        this.activeQuests[player.getUniqueId()] = new QuestStatus(player.getUniqueId(), this.registeredQuests[questID]);
+        this.activeQuests[player.getUniqueId()] = new QuestStatus(this, player.getUniqueId(), this.registeredQuests[questID]);
         let quest = this.registeredQuests[questID];
         let questTitle = new Title('New Quest:', quest.name)
                     .color('red')
@@ -99,23 +113,64 @@ export class QuestFactory {
                 questTitle.send(player);
     }
 
-    saveQuester(playerID) {
+    isQuesting(player) {
+        return this.activeQuests[player.getUniqueId()] != undefined && 
+        !this.activeQuests[player.getUniqueId()].isCompleted;
+    }
+
+    saveQuester(playerId) {
         // to save a quest point, we need:
         // - player UUID
         // - quest UUID
         // - an array of the current counts of objectives
         // Simple, yes?
-        var status = this.activeQuests[playerID] as QuestStatus;
-        if (!status || status.isCompleted) return false;
-        var savePoint = new QuestSavePoint(playerID, status.quest, status.objectives.map(e => {
+        var status = this.activeQuests[playerId.toString()] as QuestStatus;
+        if (!status || status.isComplete()) return false;
+        var quest = this.registeredQuests[status.quest] as Quest;
+        // create the current save point
+        var savePoint = new QuestSavePoint(playerId.toString(), quest.name, status.objectives.map(e => {
             return e.currentCount;
         }));
+        // persist the save point
+        table.set(`qstr;${playerId}`, savePoint);
+        // save completed quest line to the user profile
+        var profile = pf.getProfile(playerId);
+        profile.set('quests', 'completedQuests', this.completedQuests[playerId]);
         return savePoint;
     }
 
-    loadQuester(save: QuestSavePoint) {
-        var quest = 
-        this.activeQuests[save.playerUUID]
+    loadQuester(player) {
+        var playerId = player.getUniqueId();
+        // load the completed quests from the profile
+        var profile = pf.getProfile(playerId);
+        var completedQuests = profile.get('quests', 'completedQuests');
+        this.completedQuests[playerId] = completedQuests;
+        // load the current quest
+        var savePoint = table.get(`qstr;${playerId}`);
+        if (!savePoint) return;
+        var status = this.readQuestStatusFromSave(savePoint, player);
+        this.activeQuests[playerId] = status;
+        status.updateScoreboard();
+    }
+
+    private readQuestStatusFromSave(save: QuestSavePoint, player) {
+        var quest = this.registeredQuests[save.questName];
+        var status = new QuestStatus(this, player, quest);
+        for (let i = 0; i < save.objStates.length; i++) {
+            let objState = save.objStates[i];
+            let objCurrent = status.objectives[i];
+            objCurrent.setCurrentStatus(objState);
+            status.updateObjStatus(objCurrent);
+            objCurrent.beginWatch(player);
+        }
+        return status;
+    }
+
+    unloadQuester(playerId) {
+        var savePoint = this.saveQuester(playerId);
+        if (!savePoint) return;
+        delete(this.activeQuests[playerId]);
+        delete(this.completedQuests[playerId]);
     }
 }
 
@@ -124,45 +179,78 @@ export class QuestFactory {
  */
 export class QuestSavePoint {
     playerUUID: string;
-    questUUID: string;
+    questName: string;
     objStates: number[] = [];
 
-    constructor(playerUUID: string, questUUID: string, objStates: number[]) {
+    constructor(playerUUID: string, questName: string, objStates: number[]) {
         this.playerUUID = playerUUID;
-        this.questUUID = questUUID;
+        this.questName = questName;
         this.objStates = objStates;
     }
 }
-
 
 export class QuestStatus {
     player;
     objectives: QuestObjective[];
     scoreboard: Scoreboard;
     quest: string;
-    isCompleted: boolean = false;
+    isCompleted = {};
+    factory: QuestFactory;
 
-    constructor(playerUUID, quest: Quest) {
-        this.player = Bukkit.getPlayer(playerUUID);
+    constructor(factory: QuestFactory, player, quest: Quest) {
+        this.factory = factory;
+        this.player = player;
         this.objectives = quest.objectives.slice(0);
         this.scoreboard = new Scoreboard(`\xA7e${quest.name}`);
-        this.quest = quest.id;
+        this.quest = quest.name;
         for (let i = 0; i < this.objectives.length; i++) {
             let obj = this.objectives[i];
-            this.scoreboard.addEntry(`${QuestType[obj.type].toLowerCase()} ${obj.count} ${obj.target.toString().toLowerCase().replace('_', ' ')}`);
+            let objText = `${QuestType[obj.type].toLowerCase()} ${obj.count} ${obj.target.toString().toLowerCase().replace('_', ' ')}`;
+            let score = this.scoreboard.addEntry(
+                `${incompletePrefix}${objText}`, 
+                0,
+                obj.id);
             obj.on('$progress', (sender, args) => {
-                this.scoreboard.setEntry(i, sender._currentCount);
+                this.scoreboard.setEntry(obj.id, sender.currentCount);
             });
             obj.on('$completed', (sender, args) => {
-                this.scoreboard.destroy();
-                quest.reward.giveTo(this.player);
-                for (let j = 0; j < quest.npcSpeechFinish.length; j++) {
-                    this.player.sendMessage(quest.npcSpeechFinish[j]);
+                this.updateObjStatus(obj);
+                this.isCompleted[sender.name] = true;
+                if (this.isComplete()) {
+                    this.factory.completedQuests[this.player.getUniqueId()].push(this.quest);
                 }
-                this.isCompleted = true;
             });
             obj.beginWatch(this.player);
+            this.isCompleted[obj.id] = false;
         }
         if (quest.showScoreboard) this.scoreboard.send(this.player);
+    }
+
+    updateObjStatus(obj: QuestObjective) {
+        let objText = `${QuestType[obj.type].toLowerCase()} ${obj.count} ${obj.target.toString().toLowerCase().replace('_', ' ')}`;
+        if (obj.currentCount >= obj.count)
+            this.scoreboard.setEntry(obj.id, obj.currentCount, `${completePrefix}${objText}`);
+        else 
+            this.scoreboard.setEntry(obj.id, obj.currentCount, `${incompletePrefix}${objText}`);
+    }
+
+    updateScoreboard() {
+        for (let i = 0; i < this.objectives.length; i++) {
+            let obj = this.objectives[i];
+            this.scoreboard.setEntry(obj.id, obj.currentCount);
+        }
+    }
+
+    isComplete() {
+        for (let id in this.isCompleted) {
+            if (!this.isCompleted[id]) return false;
+        }
+        return true;
+    }
+
+    destroy() {
+        delete(this.objectives);
+        delete(this.isCompleted);
+        delete(this.scoreboard);
     }
 }

@@ -1,4 +1,5 @@
 import { QuestType } from './quest-actions';
+import * as guid from 'guid';
 
 export class QuestObjective {
     // Public properties
@@ -8,14 +9,17 @@ export class QuestObjective {
     public currentCount: number = 0;
     public location;
     public cancelToken;
+    public id: number;
 
     // Private properties
     private _eventHandlers: {};
     private _cancelReason: string;
+    private _isWatching: boolean = false;
 
-    constructor(type: QuestType, target, count: number = 1, location = null) {
+    constructor(type: QuestType, target, id: number, count: number = 1, location = null) {
         this.type = type;
         this.target = target;
+        this.id = id;
         this.count = count;
         this.location = location;
         this._eventHandlers = {
@@ -34,7 +38,7 @@ export class QuestObjective {
      * @param event 
      * @param handler 
      */
-    on(event: string, handler: (QuestObjective, any) => void) {
+    on(event: string, handler: (QuestObjective, EventArgs) => void) {
         if (!this._eventHandlers[event]) throw new Error('Event "' + event + '" does not exist.');
         this._eventHandlers[event].push(handler);
     }
@@ -50,8 +54,10 @@ export class QuestObjective {
      * Registers the events to watch.
      */
     beginWatch(player) {
+        if (this._isWatching) return;
+        this._isWatching = true;
         if (this.count <= this.currentCount) {
-            this._eventHandlers['$completed'](this);
+            this.callHandlersFor('$completed', undefined);
             return;
         }
         if (this.type == QuestType.BREAK) {
@@ -63,7 +69,7 @@ export class QuestObjective {
                 }
                 if (this.count <= this.currentCount) {
                     this.callHandlersFor('$completed', e);
-                    unregisterEvent(this.cancelToken);
+                    unregisterEvent(block, 'bbreak', this.cancelToken);
                 }
             });
         }
@@ -78,7 +84,7 @@ export class QuestObjective {
                     }
                 if (this.count <= this.currentCount) {
                     this.callHandlersFor('$completed', e);
-                    unregisterEvent(this.cancelToken);
+                    unregisterEvent(entity, 'breed', this.cancelToken);
                 }
             });
         }
@@ -94,7 +100,7 @@ export class QuestObjective {
                     }
                 if (this.count <= this.currentCount) {
                     this.callHandlersFor('$completed', e);
-                    unregisterEvent(this.cancelToken);
+                    unregisterEvent(inventory, 'pickupItem', this.cancelToken);
                 }
             });
         }
@@ -110,7 +116,7 @@ export class QuestObjective {
                     }
                 if (this.count <= this.currentCount) {
                     this.callHandlersFor('$completed', e);
-                    unregisterEvent(this.cancelToken);
+                    unregisterEvent(inventory, 'craft', this.cancelToken);
                 }
             });
         }
@@ -123,14 +129,15 @@ export class QuestObjective {
                 }
                 if (this.count <= this.currentCount) {
                     this.callHandlersFor('$completed', e);
-                    unregisterEvent(this.cancelToken);
+                    unregisterEvent(player, 'fish', this.cancelToken);
                 }
             });
         }
         if (this.type == QuestType.KILL) {
             this.cancelToken = 
             registerEvent(entity, 'death', (e) => {
-                if (e.getEntity().getKiller().class ==  org.bukkit.entity.PlayerEntity.class &&
+                if (e.getEntity().getKiller() != null &&
+                    e.getEntity().getKiller().getUniqueId != undefined && 
                     e.getEntity().getKiller().getUniqueId() == player.getUniqueId() &&
                     e.getEntity().getType() == this.target) {
                         this.currentCount++;
@@ -138,7 +145,7 @@ export class QuestObjective {
                     }
                 if (this.count <= this.currentCount) {
                     this.callHandlersFor('$completed', e);
-                    unregisterEvent(this.cancelToken);
+                    unregisterEvent(entity, 'death', this.cancelToken);
                 }
             });
         }
@@ -147,7 +154,7 @@ export class QuestObjective {
             registerEvent(player, 'move', (e) => {
                 if (e.getTo().distanceSquared(this.target) < 10) {
                     this.callHandlersFor('$completed', e);
-                    unregisterEvent(this.cancelToken);
+                    unregisterEvent(player, 'move', this.cancelToken);
                 }
             });
         }
@@ -157,7 +164,7 @@ export class QuestObjective {
                 if (e.getPlayer().getUniqueId() ==  player.getUniqueId() && 
                     e.getBlock().type == this.target.type) {
                         this.callHandlersFor('$completed', e);
-                        unregisterEvent(this.cancelToken);
+                        unregisterEvent(block, 'place', this.cancelToken);
                     }
             });
         }
@@ -171,7 +178,7 @@ export class QuestObjective {
                     }
                 if (this.count <= this.currentCount) {
                     this.callHandlersFor('$completed', e);
-                    unregisterEvent(this.cancelToken);
+                    unregisterEvent(inventory, 'extract', this.cancelToken);
                 }
             });
         }
@@ -181,6 +188,6 @@ export class QuestObjective {
      * Unregisters the event handlers and cancel tokens.
      */
     destroy() {
-        unregisterEVent(this.cancelToken);
+        // TODO
     }
 }
