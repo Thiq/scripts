@@ -7,22 +7,17 @@
 
 Thiq is 1 part Java and 1 part JavaScript. For one to work, one needs the other. Within Thiq, there are core JS libraries that ensure a constant system within the JS environment. "Why not do everything there?" The point of Thiq was to make fast, simple, and scalable solutions for plugin development within Spigot, one that Java does neither fast nor simple. One can say that it's easy to create a plugin, but what steps do you have to take? Create the project, assign dependencies, configure Maven, configure where the src sits at, and you haven't even started coding yet. Thiq makes it simple. It's a simple `create`, `write`, and `reload`. 
 
-## How To Use
-Once you drop your Thiq.jar into your servers plugin directory, clone this repo into it as well. There are 4 main parts of this repo that require this plugin to work.
-
-_Four???! But why so many?? Why not automate it?!_ 
-
-That'd be nice, but while those 4 parts are required, they're also customizable.
 ### Items of Importance and Loading
 When Thiq initializes, it loads the internal core repository, to ensure that nothing funky happens across multiple servers. It allows a consistency, almost like Google's V8 engine (except not because it's not that impressive). The core repository includes things like `logger`, `require`, `promise`, `tts`, `events`, etc. All the core things to allow for a full JS environment. After those are loaded, the following events happen in order:
 
-1: `./Thiq/thiq.json` is read. This contains information about the current environment that we should included in the `process` module, but also what libraries to load into the environment. ```
+1: `./Thiq/thiq.json` is read. This contains information about the current environment that we should included in the `process` module, but also what libraries to load into the environment. 
+```
 {
   "libraries": [
     "myLib.js"
   ]
-}```
-All of the files within `libraries` are in relation to `./Thiq/libs`. 
+}
+```
 
 2: `./libs/` This is where all of the libraries that affect gameplay are kept (ideally). In reality, you could really keep anything in there, but for the sake of structure, if a library doesn't directly expose an API or is not a module, it goes in this directory.
 
