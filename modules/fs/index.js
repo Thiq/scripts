@@ -230,12 +230,18 @@ exports.closeSync = function(fd) {
 }
 
 exports.exists = function(path, callback) {
-    var e = new File(path).exists();
-    callback(e);
+    try {
+        var e = new File(path).isFile();
+        if (!callback) return e;
+        else callback(e, undefined);
+    } catch (ex) {
+        if (!callback) return false;
+        callback(false, ex);
+    }
 }
 
 exports.existsSync = function(path) {
-    return new File(path).exists();
+    return new File(path).isFile();
 }
 
 exports.fchmod = function(fd, mode, callback) {
@@ -418,6 +424,8 @@ exports.readdirSync = function(path, options) {
  */
 exports.readFile = function(path, options, callback) {
     new Promise(function(resolve, reject) {
+        var file = new File(path);
+        file.createNewFile();
         var fIn = new BufferedReader(new InputStreamReader(new FileInputStream(location), "UTF8"));
 
         var line;
@@ -445,7 +453,7 @@ exports.readFile = function(path, options, callback) {
  */
 exports.readFileSync = function(path, options) {
     var file = new File(path);
-    file.createNewFile();
+    if (!file.isFile()) return undefined;
     var fIn = new BufferedReader(new InputStreamReader(new FileInputStream(path), "UTF8"));
 
     var line;
@@ -597,7 +605,12 @@ exports.write = function(fd, buffer, offset, length, position, callback) {
 
 exports.writeFile = function(file, data, options, callback) {
     new Promise(function() {
-        exports.writeFileSync(file, data, options);
+        try {
+            exports.writeFileSync(file, data, options);
+            resolve(undefined);
+        } catch (ex) {
+            reject(ex);
+        }
     }).then(function(result) {
         if (!callback) return;
         callback(undefined, result);
@@ -611,7 +624,6 @@ exports.writeFileSync = function(file, data, options) {
     var f = new File(file);
     f.createNewFile();
     var f_out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "UTF8"));
-
     f_out.write(data.toString(), 0, data.toString().length);
     f_out.flush();
     f_out.close();
@@ -625,10 +637,6 @@ exports.new = function(location, data) {
     f_out.append(data);
     f_out.flush();
     f_out.close();
-}
-
-exports.exists = function(location) {
-    return new File(location).exists();
 }
 
 exports.clear = function(location) {
