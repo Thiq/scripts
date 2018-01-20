@@ -16,7 +16,7 @@ export class VersioningData {
 // if these requirements are not met, then it will assume the current version is most-up-to-date
 // it returns whether or not the current installed version is valid.
 export function verifyVersion(data: VersioningData, url: string): Promise<boolean> {
-	return new Promise<bool>((resolve, reject) => {
+	return new Promise<boolean>((resolve, reject) => {
 		httpClient.get(url).then((result) => {
 			let json = JSON.parse(result);
 			if (!isValidJson(json)) resolve(true);

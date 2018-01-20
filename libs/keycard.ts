@@ -25,3 +25,7 @@ class KeycardLockedRegion {
         this.keycardValue = sha.read().toString();
     }
 }
+
+class KeycardLockedItem {
+    
+}

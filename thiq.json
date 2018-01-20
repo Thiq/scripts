@@ -12,7 +12,8 @@
         "keycard.ts",
         "play-time.js",
         "greeting.js",
-        "mention.js"
+        "mention.js",
+        "mounts.ts"
     ],
     "verboseLogging": false
 }
