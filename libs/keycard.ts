@@ -27,5 +27,10 @@ class KeycardLockedRegion {
 }
 
 class KeycardLockedItem {
+    target; // Block
+
+}
+
+class Keycard {
     
 }

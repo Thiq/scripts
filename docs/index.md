@@ -1,9 +1,15 @@
 # Welcome to Thiq's Documents
 
-These docs will teach you how to setup your Thiq environment, adding custom scripts, and create a brand new gameplay for your players. The docs are split up into 4 different parts:
+These docs will teach you how to setup your Thiq environment, adding custom scripts, and create a brand new gameplay for your players. The docs are split up into 5 different parts:
+
 - Setting Up
+
 - Creating A New Library Script
+
 - Create A New Module
+
+- Loaders
+
 - API References (for you nerds out there)
 
 Before we get started, there are a few requirements for Thiq.
