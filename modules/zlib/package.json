@@ -1,0 +1,5 @@
+{
+    "loader": "typescript",
+    "name": "zlib",
+    "version": "1.0.2"
+}

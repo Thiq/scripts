@@ -11,6 +11,7 @@
         "resource-signs.js",
         "keycard.ts",
         "play-time.js",
+        "keycard.ts",
         "greeting.js",
         "mention.js",
         "mounts.ts"

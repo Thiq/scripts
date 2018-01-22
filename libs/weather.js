@@ -3,18 +3,27 @@
     var Gui = require('gui');
     var weatherGui = new Gui();
     weatherGui.setTitle('Weather Master');
-    weatherGui.add(itemStack(160, 1, 4), { name: '\xA7eSunny' },
+    weatherGui.add(itemStack({
+        type: 160,
+        data: 4
+    }), { name: '\xA7eSunny' },
         function(player) {
             player.world.setStorm(false);
             player.sendMessage('Set weather to sunny!');
         });
-    weatherGui.add(itemStack(160, 1, 3), { name: '\xA7bLight rain' },
+    weatherGui.add(itemStack({
+        type: 160,
+        data: 3
+    }), { name: '\xA7bLight rain' },
         function(player) {
             player.world.setStorm(true);
             player.world.setThundering(false);
             player.sendMessage('Set weather to light rain!');
         });
-    weatherGui.add(itemStack(160, 1, 11), { name: '\xA79Stormy' },
+    weatherGui.add(itemStack({
+        type: 160,
+        data: 11
+    }), { name: '\xA79Stormy' },
         function(player) {
             player.world.setStorm(true);
             player.world.setThundering(true);

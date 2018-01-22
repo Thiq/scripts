@@ -65,18 +65,38 @@ global.getItemId = function(value) {
     }
 }
 
-global.itemStack = function(id, amount, data, meta) {
-    id = getItemId(id);
-    var item = new org.bukkit.inventory.ItemStack(id);
-    if (amount != undefined) {
-        item.amount = amount;
+global.itemStack = function(options) {
+    if (!options) return new org.bukkit.inventory.ItemStack(Material.AIR);
+    if (!options.type) throw new Error('No block type passed to itemstack creation.');
+    options.type = getItemId(options.type);
+    if (!options.count) options.count = 1;
+    if (!options.lore) options.lore = [];
+    if (!options.enchants) options.enchants = [];
+    if (options.isUnbreakable == undefined) options.isUnbreakable = false;
+    if (!options.flags) options.flags = [];
+    var item = new org.bukkit.inventory.ItemStack(options.type);
+    item.amount = options.count;
+    if (options.data != undefined) {
+        item.durability = options.data;
     }
-    if (data != undefined) {
-        item.durability = data;
+    var meta = item.getItemMeta();
+    if (options.displayName != undefined) {
+        meta.setDisplayName(options.displayName);
     }
-    if (meta != undefined) {
-        item.itemMeta = meta;
+    if (options.localizedName != undefined) {
+        meta.setLocalizedName(options.localizedName);
     }
+    meta.setUnbreakable(options.isUnbreakable);
+    meta.setLore(options.lore);
+    for (var i = 0; i < options.flags.length; i++) {
+        var flag = options.flags[i];
+        meta.addItemFlags(flag);
+    }
+    for (var i = 0; i < options.enchants.length; i++) {
+        var enchant = options.enchants[i];
+        meta.addEnchant(enchant.enchantment, enchant.level || 1, enchant.ignoreLevelRestriction === true);
+    }
+    item.setItemMeta(meta);
     return item;
 }
 

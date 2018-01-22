@@ -1,36 +1,29 @@
 // turns WorldGuard areas into key-card access areas only.
-import * as crypto from 'crypto';
+import * as guid from 'guid';
+import * as enderChest from 'ender-chest';
 
-class KeycardLockedRegion {
-    /**
-     * The WorldGuard region the class is tied to.
-     */
-    wgRegionId: string;
-    /**
-     * A SHA-128 value that the key has embedded into it. If a key does not have this value, 
-     * the key does not fit with this region.
-     */
-    keycardValue: string;
+export class Keycard {
+    id: string;
+    stack;
 
-    constructor(wgRegionId: string) {
-        this.wgRegionId = wgRegionId;
+    constructor() {
+        this.id = guid();
+        this.stack = itemStack({ type: org.bukkit.Material.IRON_NUGGET, lore: [ '\xA7k' + this.id.toString() ], displayName: '\xA7aKey', localizedName: '\xA7akey' });
     }
 
-    /**
-     * Generates a new value for the keycard.
-     */
-    generateNewHash() {
-        var sha = crypto.createHash('SHA256');
-        sha = sha.update(this.wgRegionId + Date.now());
-        this.keycardValue = sha.read().toString();
+    serialize() {
+        return {
+            id: this.id,
+            stack: this.stack
+        };
+    }
+
+    deserialize(input) {
+        this.id = input.id;
+        this.stack = input.stack;
     }
 }
 
-class KeycardLockedItem {
-    target; // Block
-
-}
-
-class Keycard {
+registerEvent(player, 'interactEntity', (event) => {
     
-}
+});
