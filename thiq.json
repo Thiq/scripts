@@ -14,7 +14,9 @@
         "keycard.ts",
         "greeting.js",
         "mention.js",
-        "mounts.ts"
+        "mounts.ts",
+        "pipes/index.ts",
+        "block-reset.js"
     ],
     "verboseLogging": false
 }
