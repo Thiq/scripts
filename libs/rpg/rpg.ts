@@ -1,0 +1,1 @@
+import * as quest from 'quests';

@@ -25,8 +25,7 @@ When Thiq initializes, it loads the internal core repository, to ensure that not
 
 4: `./startup.js` After everything in the `libs` folder is loaded, this file is called. For any plugins or modules that require initialization on startup, this is the file where you wanna do it. Once `startup.js` is finished being called, Thiq is finished loading and is ready for the fight.
 
-## Documentation
-Documentation is coming soon&trade;. 
+## [Documentation](http://api.thiq.org/docs)
 ## Contributing
 Contributions are always welcome. The main goal is to recreate the NodeJS environment within the JavaEE stack, so core module updates are recommended. To contribute, just pull the code and submit a pull request with ${USERNAME}-{FEATURENAME}.
 ## License

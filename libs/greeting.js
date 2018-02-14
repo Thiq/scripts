@@ -1,4 +1,4 @@
-var keycard = require('./libs/keycard');
+var keycard = require('./keycard');
 
 registerEvent(player, 'join', function(e) {
     var key = new keycard.Keycard();

@@ -4,7 +4,7 @@ import * as math from '@java.lang.Math';
 
 const MoveType = nms.get('EnumMoveType');
 
-export default class Mount {
+class Mount {
     entityType;
     entity;
     player;

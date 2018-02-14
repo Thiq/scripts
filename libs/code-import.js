@@ -4,7 +4,7 @@ var fs = require('fs');
 registerCommand({
     name: 'fetch',
     description: 'Downloads and loads scripts from external sources such as pastebin or GitHub.',
-    usage: '\xA7eUsage: /<command> <url> <filename>',
+    usage: '\xA7cUsage: /<command> <url> <filename>',
     permission: registerPermission('thiq.code.fetch', 'op'),
     permissionMessage: '\xA7cYou do not have sufficient permissions to use that.'
 }, function(sender, label, args) {
