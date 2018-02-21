@@ -1,7 +1,7 @@
 var enderChest = require('ender-chest');
 var table = enderChest.getTable('block_reset');
 
-registerEvent(block, 'physics', function(e) {
+eventHandler('block', 'physics', function(e) {
     var block = e.block;
     var sign = e.block.getRelative(org.bukkit.block.BlockFace.UP, 0);
     var location = block.getState().getLocation();

@@ -12,6 +12,6 @@
 // At normal speed, it should take a block 3 seconds to move 1 MCU (minecraft unit), no matter which vector direction. At high speed, it'll move 1 block in .5 seconds, increasing time by .5 seconds every block, essentially boosting it for 5 blocks.
 // If an item reaches the container and there is no room, it will drop onto the ground.
 
-import * as PipeFactory from './libs/pipes/factory';
+import * as PipeFactory from './factory';
 
 

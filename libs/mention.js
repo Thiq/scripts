@@ -2,7 +2,7 @@ var Title = require('titles').ActionBarTitle;
 var title = new Title().stay(500);
 var pf = require('pf');
 
-registerEvent(player, 'chat', function(e) {
+eventHandler('player', 'chat', function(e) {
     doMention(e);
 });
 

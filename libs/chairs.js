@@ -3,7 +3,7 @@ var Material = require('@org.bukkit.Material');
 var BlockFace = require('@org.bukkit.block.BlockFace');
 
 var registeredChairs = [];
-registerEvent(player, 'interact', function(event) {
+eventHandler('player', 'interact', function(event) {
     if (event.action != Action.RIGHT_CLICK_BLOCK ||
         event.player.getInventory().getItemInMainHand().type != Material.AIR ||
         !isChair(event.getClickedBlock()))

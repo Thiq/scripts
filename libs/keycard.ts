@@ -77,6 +77,7 @@ abstract class KeyLockedObject {
     keyId: string;
 }
 
-registerEvent(player, 'interactEntity', (event) => {
-    
+eventHandler('player', 'interact', (event) => {
+    let block = event.getClickedBlock();
+    // see if the block is a locked block/area
 });

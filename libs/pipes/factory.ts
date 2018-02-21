@@ -1,5 +1,5 @@
-import { Pipe, PipeType } from './libs/pipes/pipe';
-import * as PipedStack from './libs/pipes/stack';
+import { Pipe, PipeType } from './pipe';
+import * as PipedStack from './stack';
 
 export default class PipeFactory {
     

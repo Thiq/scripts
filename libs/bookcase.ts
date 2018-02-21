@@ -100,7 +100,7 @@ class BookcaseBook {
     }
 }
 
-registerEvent(player, 'interact', (e) => {
+eventHandler('player', 'interact', (e) => {
     let clickedBlock = e.getClickedBlock();
     if (e.getAction() != InventoryAction.RIGHT_CLICK_BLOCK) return;
     if (clickedBlock.getType() != org.bukkit.Material.BOOKSHELF) return;
@@ -114,11 +114,11 @@ registerEvent(player, 'interact', (e) => {
     openedBookcases[e.player.getUniqueId()] = position;
 });
 
-registerEvent(inventory, 'close', (e) => {
+eventHandler('inventory', 'close', (e) => {
     openedBookcases[e.player.getUniqueId()] = undefined;
 });
 
-registerEvent(inventory, 'moveItem', (e) => {
+eventHandler('inventory', 'moveItem', (e) => {
     let player = e.getWhoClicked();
     let bookcase = openedBookcases[player.getUniqueId()] as Bookcase;
     if (!bookcase) return;

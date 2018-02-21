@@ -9,15 +9,15 @@ for (var i = 0; i < players.length; i++) {
 	trackedLogins[p.getUniqueId()] = p.getLastPlayed();
 }
 
-registerEvent(player, 'join', function(e) {
+eventHandler('player', 'join', function(e) {
 	trackedLogins[e.getPlayer().getUniqueId()] = e.getPlayer().getLastPlayed();
 });
 
-registerEvent(player, 'quit', function(e) {
+eventHandler('player', 'quit', function(e) {
 	savePlayerTime(e.getPlayer());
 });
 
-registerEvent(server, 'pluginDisable', function(e) {
+eventHandler('server', 'pluginDisable', function(e) {
 	if (e.getPlugin().getName() == 'Thiq') {
 		var players = Bukkit.getOnlinePlayers();
 		for (var i = 0; i < players.length; i++) {

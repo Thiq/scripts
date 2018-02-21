@@ -1,7 +1,7 @@
 var Material = require('@org.bukkit.Material');
 var BlockFace = require('@org.bukkit.block.BlockFace');
 
-registerEvent(block, 'bbreak', function(e) {
+eventHandler('block', 'break', function(e) {
     var b = e.getBlock();
     var itemInHand = e.getPlayer().getInventory().getItemInHand();
     if (itemInHand.type != Material.GOLD_AXE) return;
