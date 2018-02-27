@@ -16,3 +16,9 @@ Object.extend = function(source, target) {
         target[property] = source[property];
     }
 }
+
+Object.printProperties = function(src) {
+    for (var field in src) {
+        if (src.hasOwnProperty(field)) console.log(field);
+    }
+}

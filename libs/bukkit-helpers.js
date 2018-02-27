@@ -124,3 +124,36 @@ global.getNms = function(c) {
     if (!c) return namespace + version;
     else return Java.type(namespace + version + '.' + c);
 }
+
+eventHandler('server', 'pluginEnable', function(e) {
+    var plugin = e.getPlugin();
+    // TODO: should I get all classes from within a plugin and load their package into the global object?
+    if (plugin == getPlugin()) return;
+    global[plugin.getClass().getName()] = plugin;
+    createGlobalObjectFromClass(plugin.getClass());
+    var listeners = org.bukkit.event.HandlerList.getRegisteredListeners(plugin);
+    // this is some jewery
+    listeners.forEach(function(l) {
+        var lClass = l.getClass();
+        var lMethods = lClass.getMethods();
+        for (var j = 0; j < lMethods.length; j++) {
+            var method = lMethods[j];
+            var mAnnotations = method.getDeclaredAnnotations();
+            var mParams = method.getParameterTypes();
+            for (var i = 0; i < mParams.length; i++) {
+                if (mParams.length != 1) continue;
+                var type = mParams[i];
+                var isEvent = type.isAssignableFrom(org.bukkit.event.Event.class);
+                if (!isEvent) continue;
+                createGlobalObjectFromClass(lClass);
+                createGlobalObjectFromClass(type);
+            }
+        }
+    })
+});
+
+// we need to find a way to iterate through all of a package name (ie: net.conji.thiq.Thiq) and create
+// a global object of the final type
+function createGlobalObjectFromClass(type) {
+    
+}
