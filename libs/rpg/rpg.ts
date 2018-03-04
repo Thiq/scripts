@@ -1,1 +1,2 @@
-import * as quest from 'quests';
+import { QuestFactory } from 'quests';
+const questFactory = new QuestFactory();

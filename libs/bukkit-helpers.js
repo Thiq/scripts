@@ -80,23 +80,27 @@ global.itemStack = function(options) {
         item.durability = options.data;
     }
     var meta = item.getItemMeta();
-    if (options.displayName != undefined) {
-        meta.setDisplayName(options.displayName);
+    if (meta) {
+        if (options.displayName != undefined) {
+            meta.setDisplayName(options.displayName);
+        }
+        if (options.localizedName != undefined) {
+            meta.setLocalizedName(options.localizedName);
+        }
+        if (options.isUnbreakable != undefined) {
+            meta.setUnbreakable(options.isUnbreakable);
+        }
+        meta.setLore(options.lore);
+        for (var i = 0; i < options.flags.length; i++) {
+            var flag = options.flags[i];
+            meta.addItemFlags(flag);
+        }
+        for (var i = 0; i < options.enchants.length; i++) {
+            var enchant = options.enchants[i];
+            meta.addEnchant(enchant.enchantment, enchant.level || 1, enchant.ignoreLevelRestriction === true);
+        }
+        item.setItemMeta(meta);
     }
-    if (options.localizedName != undefined) {
-        meta.setLocalizedName(options.localizedName);
-    }
-    meta.setUnbreakable(options.isUnbreakable);
-    meta.setLore(options.lore);
-    for (var i = 0; i < options.flags.length; i++) {
-        var flag = options.flags[i];
-        meta.addItemFlags(flag);
-    }
-    for (var i = 0; i < options.enchants.length; i++) {
-        var enchant = options.enchants[i];
-        meta.addEnchant(enchant.enchantment, enchant.level || 1, enchant.ignoreLevelRestriction === true);
-    }
-    item.setItemMeta(meta);
     return item;
 }
 
@@ -125,35 +129,23 @@ global.getNms = function(c) {
     else return Java.type(namespace + version + '.' + c);
 }
 
-eventHandler('server', 'pluginEnable', function(e) {
-    var plugin = e.getPlugin();
-    // TODO: should I get all classes from within a plugin and load their package into the global object?
-    if (plugin == getPlugin()) return;
-    global[plugin.getClass().getName()] = plugin;
-    createGlobalObjectFromClass(plugin.getClass());
-    var listeners = org.bukkit.event.HandlerList.getRegisteredListeners(plugin);
-    // this is some jewery
-    listeners.forEach(function(l) {
-        var lClass = l.getClass();
-        var lMethods = lClass.getMethods();
-        for (var j = 0; j < lMethods.length; j++) {
-            var method = lMethods[j];
-            var mAnnotations = method.getDeclaredAnnotations();
-            var mParams = method.getParameterTypes();
-            for (var i = 0; i < mParams.length; i++) {
-                if (mParams.length != 1) continue;
-                var type = mParams[i];
-                var isEvent = type.isAssignableFrom(org.bukkit.event.Event.class);
-                if (!isEvent) continue;
-                createGlobalObjectFromClass(lClass);
-                createGlobalObjectFromClass(type);
-            }
+// turns something like -myName test into { myName: test }
+String.prototype.getArgs = function() {
+    var input = this;
+    var result = {};
+    var sects = input.split(' ');
+    var last = null;
+    for (var i = 0; i < sects.length; i++) {
+        var item = sects[i];
+        if (item.startsWith('-')) {
+            // we aren't targeting an arg
+            var name = item.substring(1);
+            result[name] = ''; // reset or create new
+            last = name;
+        } else {
+            if (!last) continue;
+            result[last] += ((result[last] != '' ? ' ' : '') + item);
         }
-    })
-});
-
-// we need to find a way to iterate through all of a package name (ie: net.conji.thiq.Thiq) and create
-// a global object of the final type
-function createGlobalObjectFromClass(type) {
-    
+    }
+    return result;
 }

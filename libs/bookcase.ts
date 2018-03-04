@@ -1,8 +1,10 @@
 import * as ender from 'ender-chest';
 import * as guid from 'guid';
 import * as _ from 'underscore';
+import * as Action from '@org.bukkit.event.block.Action';
 import * as InventoryAction from '@org.bukkit.event.inventory.InventoryAction';
 import * as ClickType from '@org.bukkit.event.inventory.ClickType';
+import * as Material from '@org.bukkit.Material';
 const table = ender.getTable('bookcases');
 const registeredBookcases = table.get('bookcases') || {};
 const books = table.get('books');
@@ -75,7 +77,7 @@ class BookcaseBook {
 
     toItemStack() {
         var stack = itemStack({
-            type: org.bukkit.Material.BOOKSHELF
+            type: Material.BOOKSHELF
         });
     }
 
@@ -84,14 +86,15 @@ class BookcaseBook {
     }
 
     save() {
-        var index = _.findIndexOf(books, { title: this.title });
+        var index = _.findIndex(books, { title: this.title });
         if (index == -1) books.push(this);
         else books[index] = this;
         table.save();
     }
 
     static get(title): BookcaseBook {
-        var found = _.findIndexOf(books, { title: title });
+        var found = _.findIndex(books, { title: title });
+        
         if (found == -1) return undefined;
         var book = books[found];
         var result = new BookcaseBook(book.author, book.pages, book.title);
@@ -102,8 +105,8 @@ class BookcaseBook {
 
 eventHandler('player', 'interact', (e) => {
     let clickedBlock = e.getClickedBlock();
-    if (e.getAction() != InventoryAction.RIGHT_CLICK_BLOCK) return;
-    if (clickedBlock.getType() != org.bukkit.Material.BOOKSHELF) return;
+    if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+    if (clickedBlock.getType() != Material.BOOKSHELF) return;
     var position = clickedBlock.location;
     var bookcase = Bookcase.get(position);
     if (!bookcase) {
@@ -115,6 +118,7 @@ eventHandler('player', 'interact', (e) => {
 });
 
 eventHandler('inventory', 'close', (e) => {
+    
     openedBookcases[e.player.getUniqueId()] = undefined;
 });
 
@@ -126,7 +130,10 @@ eventHandler('inventory', 'moveItem', (e) => {
     var target = e.getDestination();
     var isAdding = target.getName() == 'Bookcase'; // if we're adding or removing from the bookcase
     if (isAdding) {
-        if (e.getItem().getType() != org.bukkit.Material.BOOK) return;
+        if (e.getItem().getType() != Material.BOOK) {
+            e.cancelled = true;
+            return;
+        }
         bookcase.addBook(e.getItem());
     } else {
         bookcase.removeBook(e.getItem().getItemMeta().getTitle());

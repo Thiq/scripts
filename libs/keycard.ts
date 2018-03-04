@@ -6,7 +6,7 @@ import * as _ from 'underscore';
 
 const table = enderChest.getTable('keycard');
 
-class Keycard {
+export class Keycard {
     name: string;
     id: string;
     private static $masterKey: Keycard = Keycard.deserialize(table.get('master_key'));
