@@ -5,7 +5,6 @@
 		"consts.js",
 		"code-import.js",
 		"chairs.js",
-		"admin.js",
 		"weather.js",
 		"golden-axe.js",
 		"resource-signs.js",
@@ -14,10 +13,7 @@
 		"greeting.js",
 		"mention.js",
 		"mounts.ts",
-		"pipes/index.ts",
-		"block-reset.js",
-		"bookcase.ts",
-		"rpg/rpg.ts"
+		"rpg/rpg.js"
 	],
 	"verboseLogging": false,
 	"modulesDir": "./plugins/Thiq/node_modules/"

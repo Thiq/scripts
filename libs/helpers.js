@@ -12,3 +12,19 @@ Object.printProperties = function(src) {
         console.log(field);
     }
 }
+
+String.prototype.toCamelCase = function() {
+    var result = '';
+    for (var i = 0; i < this.length; i++) {
+        if (this[i] == '_') {
+            result += ' ';
+        } else {
+            if (this[i - 1] == '_') {
+                result += this[i].toUpperCase();
+            } else {
+                result += this[i].toLowerCase();
+            }
+        }
+    }
+    return result;
+}
