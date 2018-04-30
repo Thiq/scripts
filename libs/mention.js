@@ -39,7 +39,7 @@ registerCommand({
     description: 'Manages player mention notifications',
     usage: '\xA7eUsage: /mentions [on|off]',
     permission: registerPermission('thiq.mentions.toggle', true),
-    permissionMessage: defaultPermissionMessage
+    permissionMessage: consts.defaultPermissionMessage
 }, function(sender, label, args) {
     if (!args || args.length == 0) {
         sender.sendMessage('Incorrect usage: /mentions [on|off]');

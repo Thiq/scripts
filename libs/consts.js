@@ -1,3 +1,3 @@
 global.consts = {
-    defaultPermissionMessage: "\xA7cYou don't have permission to use this!"
+    defaultPermissionMessage: "\xA7cYou don't have permission to use that!"
 }

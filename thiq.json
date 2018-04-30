@@ -8,11 +8,11 @@
 		"weather.js",
 		"golden-axe.js",
 		"resource-signs.js",
-		"keycard.ts",
+		"keycard.js",
 		"play-time.js",
 		"greeting.js",
 		"mention.js",
-		"mounts.ts",
+		"mounts.js",
 		"rpg/rpg.js"
 	],
 	"verboseLogging": false,
