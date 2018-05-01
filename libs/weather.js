@@ -33,11 +33,10 @@
     registerCommand({
         name: 'tweather',
         usage: '\xA7e/<command>',
-        permission: registerPermission('thiq.weather', 'op'),
-        permissionMessage: "\xA7cYou don't have permission to use this!",
         description: 'Brings up a UI to change the weather.',
         aliases: ['tw']
     }, function(sender, label, args) {
+        assert(sender.hasPermission('thiq.weather'), consts.defaultPermissionMessage);
         if (!isPlayer(sender)) {
             console.log('\xA7cOnly a player can call tweather!');
             return;

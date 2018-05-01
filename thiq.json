@@ -1,5 +1,6 @@
 {
 	"libraries": [
+		"assert.js",
 		"helpers.js",
 		"bukkit-helpers.js",
 		"consts.js",

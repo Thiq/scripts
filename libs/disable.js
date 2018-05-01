@@ -10,10 +10,9 @@ var isSmeltingDisabled = table.get('isSmeltingDisabled') || false;
 registerCommand({
     name: 'disable',
     usage: '\xA7eUsage: /disable [enchanting|crafting|smithing|smelting]',
-    description: 'Disables mechanics within the server.',
-    permission: registerPermission('thiq.disable', 'op'),
-    permissionMessage: consts.defaultPermissionMessage
+    description: 'Disables mechanics within the server.'
 }, function(sender, label, args) {
+    assert(sender.hasPermission('thiq.disable'), consts.defaultPermissionMessage);
     if (args.length == 0 || !args) {
         throw new Error('Incorrect usage! /disable [enchanting|craft|smithing|smelting]');
     }
