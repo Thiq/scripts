@@ -231,7 +231,7 @@ exports.closeSync = function(fd) {
 
 exports.exists = function(path, callback) {
     try {
-        var e = new File(path).isFile();
+        var e = new File(path).exists();
         if (!callback) return e;
         else callback(e, undefined);
     } catch (ex) {
@@ -241,7 +241,7 @@ exports.exists = function(path, callback) {
 }
 
 exports.existsSync = function(path) {
-    return new File(path).isFile();
+    return new File(path).exists();
 }
 
 exports.fchmod = function(fd, mode, callback) {
@@ -501,7 +501,9 @@ exports.renameSync = function(oldPath, newPath) {
 }
 
 exports.rmdir = function(path, callback) {
-    new Promise(exports.rmdirSync(path)).then(function(result) {
+    new Promise(function (resolve, reject) {
+        resolve(exports.rmdirSync(path));
+    }).then(function(result) {
         if (!callback) return;
         callback(undefined, result);
     }, function(err) {
@@ -511,10 +513,16 @@ exports.rmdir = function(path, callback) {
 }
 
 exports.rmdirSync = function(path) {
-    var directory = new File(path);
-    if (!directory.isDirectory()) throw 'Path must be a directory: ' + path;
-    directory.delete();
-    return true;
+    var f = new File(path);
+    if (f.isDirectory()) {
+        var subs = f.listFiles();
+        for (var i = 0; i < subs.length; i++) {
+            var sub = subs[i];
+            if (sub.isFile()) sub.delete();
+            else if (sub.isDirectory()) exports.rmdirSync(sub.getAbsolutePath());
+        }
+    }
+    return f.delete();
 }
 
 exports.stat = function(path, callback) {

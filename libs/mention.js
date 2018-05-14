@@ -2,7 +2,7 @@ var Title = require('titles').ActionBarTitle;
 var title = new Title().stay(500);
 var pf = require('pf');
 
-eventHandler('player', 'chat', function(e) {
+eventHandler('player', 'chat', (e) => {
     doMention(e);
 });
 
@@ -38,7 +38,7 @@ registerCommand({
     name: 'mentions',
     description: 'Manages player mention notifications',
     usage: '\xA7eUsage: /mentions [on|off]'
-}, function(sender, label, args) {
+}, (sender, label, args) => {
     assert(sender.hasPermission("thiq.mentions.toggle"), consts.defaultPermissionMessage);
     if (!args || args.length == 0) {
         sender.sendMessage('Incorrect usage: /mentions [on|off]');

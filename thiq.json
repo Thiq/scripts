@@ -4,6 +4,7 @@
 		"helpers.js",
 		"bukkit-helpers.js",
 		"consts.js",
+		"tpm.js",
 		"code-import.js",
 		"chairs.js",
 		"weather.js",
@@ -13,7 +14,6 @@
 		"play-time.js",
 		"greeting.js",
 		"mention.js",
-		"mounts.js",
 		"rpg/rpg.js"
 	],
 	"verboseLogging": false,
