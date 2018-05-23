@@ -1,4 +1,4 @@
-var system = importClass('java.lang.System');
+var system = require('@java.lang.System');
 var osName = system.getProperty('os.name');
 
 function isOSX() {

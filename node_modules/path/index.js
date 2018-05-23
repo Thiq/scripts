@@ -1,4 +1,4 @@
-var jPath = importClass('java.nio.file.Paths');
+var jPath = require('@java.nio.file.Paths');
 var os = require('os');
 
 function getDirSep() {

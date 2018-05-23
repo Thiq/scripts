@@ -1,6 +1,6 @@
 // an attempt at using Java's buffers to replicate Node functionality
-var ByteBuffer = importClass('java.nio.ByteBuffer');
-var Integer = importClass('java.lang.Integer');
+var ByteBuffer = require('@java.nio.ByteBuffer');
+var Integer = require('@java.lang.Integer');
 
 function convertByteToSigned(b) {
     if (b < 128) return b;

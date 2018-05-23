@@ -1,8 +1,8 @@
 // this uses Java based HTTP so we can incorporate it into the JS
-var HttpClient = importClass('java.net.HttpURLConnection');
-var URL = importClass('java.net.URL');
-var BufferedReader = importClass('java.io.BufferedReader');
-var InputStreamReader = importClass('java.io.InputStreamReader');
+var HttpClient = require('@java.net.HttpURLConnection');
+var URL = require('@java.net.URL');
+var BufferedReader = require('@java.io.BufferedReader');
+var InputStreamReader = require('@java.io.InputStreamReader');
 
 function get(endpoint, properties) {
     return new Promise(function(resolve, reject) {
