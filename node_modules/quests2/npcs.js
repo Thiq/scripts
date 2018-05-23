@@ -12,6 +12,10 @@ function getNPCSpeech() {
     return getPlugin('Citizens').getSpeechFactory();
 }
 
+/**
+ * 
+ * @param {QuestFactory} factory 
+ */
 function NPCFactory(factory) {
     this._registeredNPCs = [];
     this._factory = factory;

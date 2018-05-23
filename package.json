@@ -1,0 +1,6 @@
+{
+    "main": "startup.js",
+    "modules_dir": "./plugins/Thiq/node_modules/",
+    "verbose_logging": true,
+    "inspector_enabled": true
+}

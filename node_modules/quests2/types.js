@@ -19,4 +19,4 @@ const QuestType = {
     8: 'LOCATE'
 }
 
-exports.QuestType = QuestType;
+module.exports = QuestType;

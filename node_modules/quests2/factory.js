@@ -1,5 +1,5 @@
 const Quest = require('./quest').Quest;
-const QuestType = require('./types').QuestType;
+const QuestType = require('./types');
 const Reward = require('./quest').QuestReward;
 const QuestObjective = require('./objectives').QuestObjective;
 const QuestObjectiveCompletionStatus = require('./objectives').QuestObjectiveCompletionStatus;

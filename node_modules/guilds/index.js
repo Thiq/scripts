@@ -8,6 +8,7 @@ function Guild(name) {
     this.members = []; // an array of player IDs.
     this.xp = 0;
     this.level = 1;
+    guildsTable.set(id, this);
 }
 
 Guild.prototype.addPlayer = function(player) {
@@ -19,4 +20,7 @@ Guild.prototype.removePlayer = function(player) {
 }
 
 exports.Guild = Guild;
+exports.getGuild = function(id) {
+    return guildsTable.get(id);
+}
 

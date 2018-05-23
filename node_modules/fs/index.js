@@ -333,8 +333,12 @@ exports.lstatSync = function(path) {
 }
 
 exports.mkdir = function(path, mode, callback) {
-    new Promise(function() {
-        return exports.mkdirSync(path, mode);
+    new Promise(function(resolve, reject) {
+        try {
+            resolve(exports.mkdirSync(path, mode));
+        } catch (ex) {
+            reject(ex);
+        }
     }).then(function(result) {
         if (!callback) return;
         callback(undefined, result);
@@ -365,17 +369,21 @@ exports.openSync = function(path, flags, mode) {
 }
 
 exports.read = function(location, buffer, offset, length, position, callback) {
-    new Promise(function() {
-        var fIn = new BufferedReader(new InputStreamReader(new FileInputStream(location), "UTF8"));
+    new Promise(function(resolve, reject) {
+        try {
+            var fIn = new BufferedReader(new InputStreamReader(new FileInputStream(location), "UTF8"));
 
-        var line;
-        var string = "";
-        while ((line = fIn.readLine()) != null) {
-            string += line + '\n';
+            var line;
+            var string = "";
+            while ((line = fIn.readLine()) != null) {
+                string += line + '\n';
+            }
+
+            fIn.close();
+            resolve(string);
+        } catch (ex) {
+            reject(ex);
         }
-
-        fIn.close();
-        return string;
     }).then(function(result) {
         if (!callback) return;
         callback(undefined, result);
@@ -396,7 +404,13 @@ exports.readSync = function(location, buffer, offset, length, position) {
 }
 
 exports.readdir = function(path, options, callback) {
-    new Promise(exports.readdirSync(path, options)).then(function(result) {
+    new Promise(function(resolve, reject) {
+        try {
+            resolve(exports.readdirSync(path, options));
+        } catch (ex) {
+            reject(ex);
+        }
+    }).then(function(result) {
         if (!callback) return;
         callback(undefined, result);
     }, function(err) {
@@ -424,18 +438,22 @@ exports.readdirSync = function(path, options) {
  */
 exports.readFile = function(path, options, callback) {
     new Promise(function(resolve, reject) {
-        var file = new File(path);
-        file.createNewFile();
-        var fIn = new BufferedReader(new InputStreamReader(new FileInputStream(location), "UTF8"));
+        try {
+            var file = new File(path);
+            file.createNewFile();
+            var fIn = new BufferedReader(new InputStreamReader(new FileInputStream(location), "UTF8"));
 
-        var line;
-        var string = "";
-        while ((line = fIn.readLine()) != null) {
-            string += line + '\n';
+            var line;
+            var string = "";
+            while ((line = fIn.readLine()) != null) {
+                string += line + '\n';
+            }
+
+            fIn.close();
+            resolve(string);
+        } catch (ex) {
+            reject(ex);
         }
-
-        fIn.close();
-        resolve(string);
     }).then(function(result) {
         if (!callback) return;
         callback(undefined, result);
@@ -483,8 +501,12 @@ exports.realpathSync = function(path, options) {
 }
 
 exports.rename = function(oldPath, newPath, callback) {
-    new Promise(function() {
-        exports.renameSync(oldPath, newPath);
+    new Promise(function(resolve, reject) {
+        try {
+            resolve(exports.renameSync(oldPath, newPath));
+        } catch (ex) {
+            reject(ex);
+        }
     }).then(function(result) {
         if (!callback) return;
         callback(undefined, result);
@@ -502,7 +524,11 @@ exports.renameSync = function(oldPath, newPath) {
 
 exports.rmdir = function(path, callback) {
     new Promise(function (resolve, reject) {
-        resolve(exports.rmdirSync(path));
+        try {
+            resolve(exports.rmdirSync(path));
+        } catch (ex) {
+            reject(ex);
+        }
     }).then(function(result) {
         if (!callback) return;
         callback(undefined, result);
@@ -584,9 +610,9 @@ var _writeBuffer = function(fd, buffer, offset, length, position) {
 var _writeString = function(fd, string, position, encoding) {
     var file = new File(fd);
     file.createNewFile();
-    var f_out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF8"));
+    var f_out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), encoding || "UTF8"));
 
-    f_out.write(data);
+    f_out.write(string);
     f_out.flush();
     f_out.close();
 }
@@ -601,8 +627,12 @@ exports.writeSync = function(fd, buffer, offset, length, position) {
 
 // when writing a string, offset will be used as the position and length will be used as the encoding. Position will be the callback
 exports.write = function(fd, buffer, offset, length, position, callback) {
-    new Promise(function() {
-        exports.writeSync(fd, buffer, offset, length, position);
+    new Promise(function(resolve, reject) {
+        try {
+            resolve(exports.writeSync(fd, buffer, offset, length, position));
+        } catch (ex) {
+            reject(ex);
+        }
     }).then(function(result) {
         if (!callback) return;
         callback(undefined, result);
@@ -612,10 +642,9 @@ exports.write = function(fd, buffer, offset, length, position, callback) {
 }
 
 exports.writeFile = function(file, data, options, callback) {
-    new Promise(function() {
+    new Promise(function(resolve, reject) {
         try {
-            exports.writeFileSync(file, data, options);
-            resolve(undefined);
+            resolve(exports.writeFileSync(file, data, options));
         } catch (ex) {
             reject(ex);
         }
