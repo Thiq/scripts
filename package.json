@@ -1,6 +1,6 @@
 {
     "main": "./startup.js",
-    "modules_dir": "./plugins/Thiq/node_modules/",
+    "modules_dir": "node_modules",
     "verbose_logging": true,
     "inspector_enabled": true,
     "dependencies":{
