@@ -1,6 +1,7 @@
 var Title = require('titles').ActionBarTitle;
 var title = new Title().stay(500);
 var pf = require('pf');
+var assert = require('assert');
 
 eventHandler('player', 'chat', (e) => {
     doMention(e);
@@ -37,12 +38,11 @@ function hasNotificationsEnabled(player) {
 registerCommand({
     name: 'mentions',
     description: 'Manages player mention notifications',
-    usage: '\xA7eUsage: /mentions [on|off]'
+    usage: '\xA7eUsage: /<command> [on|off]'
 }, (sender, label, args) => {
     assert(sender.hasPermission("thiq.mentions.toggle"), consts.defaultPermissionMessage);
     if (!args || args.length == 0) {
-        sender.sendMessage('Incorrect usage: /mentions [on|off]');
-        return;
+        return false;
     }
     if (!isPlayer(sender)) {
         sender.sendMessage('Only players can call mentions');
@@ -51,4 +51,5 @@ registerCommand({
     var turnOn = args[0].toLowerCase() == 'on';
     pf.getProfile(sender.getUniqueId()).set('mentions', 'isEnabled', turnOn);
     sender.sendMessage('\xA7eTurned notifications ' + (turnOn ? 'on' : 'off'));
+    return true;
 });

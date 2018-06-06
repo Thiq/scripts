@@ -18,7 +18,7 @@ When Thiq is initialized, it first creates a compiler to be used. Our environmen
 
 ### The Entry File
 
-Think of this file as the `int main()` of the environment. Once the environment is finished initializing, this is called. Once this file is finished executing, Thiq is considered finished loading. 
+Think of this file as the `int main()` of the environment. Once the environment is finished initializing, this is called. Once this file is finished executing, Thiq is considered finished loading.
 
 ### Dependencies
 

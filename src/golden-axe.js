@@ -1,5 +1,6 @@
 var Material = require('@org.bukkit.Material');
 var BlockFace = require('@org.bukkit.block.BlockFace');
+var assert = require('assert');
 
 eventHandler('block', 'break', function(e) {
     if (!assert(e.getPlayer().hasPermission('thiq.utils.golden_axe'))) return;

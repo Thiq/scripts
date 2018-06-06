@@ -1,5 +1,6 @@
 var http = require("http");
 var fs = require('fs');
+var assert = require('assert');
 
 registerCommand({
     name: 'fetch',

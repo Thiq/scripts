@@ -1,5 +1,7 @@
 // An example of using the GUI to control weather.
 var Gui = require('gui');
+var assert = require('assert');
+
 var weatherGui = new Gui();
 weatherGui.setTitle('Weather Master');
 weatherGui.add(itemStack({

@@ -1,31 +1,32 @@
 {
-    "main": "./startup.js",
+    "main": "./index.js",
     "modules_dir": "node_modules",
     "verbose_logging": true,
     "inspector_enabled": true,
     "dependencies":{
         "ai": "^1.0.x",
-        "async": "^1.0.x",
-        "buffer": "^1.0.x",
         "crypto": "^1.0.x",
         "ender-chest": "^1.0.x",
-        "fs": "^1.0.x",
         "gui": "^1.0.x",
         "guid": "^1.0.x",
         "guilds": "^1.0.x",
-        "http": "^1.0.x",
         "mdate": "^1.0.x",
         "nbt": "^1.0.x",
         "nms": "^1.0.x",
-        "os": "^1.0.x",
-        "path": "^1.0.x",
         "pf": "^1.0.x",
         "placeholder": "^1.0.x",
         "quests2": "^1.0.x",
         "random": "^1.0.x",
         "scoreboard": "^1.0.x",
-        "semver": "^5.5.0",
         "titles": "^1.0.x",
         "underscore": "^1.9.0"
+    },
+    "scripts": {
+        "compile": "",
+        "test": "",
+        "install": "",
+        "prestart": "",
+        "prerestart": "",
+        "postrestart": ""
     }
 }
