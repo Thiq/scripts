@@ -1,6 +1,7 @@
 var http = require("http");
 var fs = require('fs');
 var assert = require('assert');
+var consts = require('constants');
 
 registerCommand({
     name: 'fetch',
@@ -17,7 +18,7 @@ registerCommand({
     log('Fetching code from ' + url, 'd');
     http.get(url).then(function(result) {
         engine.eval(result);
-        fs.writeFileSync('./plugins/Thiq/libs/' + filename, result);
+        fs.writeFileSync('./plugins/Thiq/src/' + filename, result);
         log('Loaded ' + filename, 'd');
     }, function(err) {
         log('Failed to fetch code from ' + url + ': ' + err);
