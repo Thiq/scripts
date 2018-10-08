@@ -3,7 +3,7 @@ var BlockFace = require('@org.bukkit.block.BlockFace');
 var assert = require('assert');
 
 eventHandler('block', 'break', function(e) {
-    if (!assert(e.getPlayer().hasPermission('thiq.utils.golden_axe'))) return;
+    if (!assert(e.getPlayer().hasPermission('thiq.utils.golden_axe') || e.getPlayer().isOp())) return;
     var b = e.getBlock();
     var itemInHand = e.getPlayer().getInventory().getItemInHand();
     if (itemInHand.type != Material.GOLD_AXE) return;
